@@ -16,6 +16,10 @@ export default function Home() {
       <p>
         <Link href="/media">Media</Link>
       </p>
+
+      <p>
+        <Link href="/geolocation">Geolocation</Link>
+      </p>
     </div>
   );
 }
