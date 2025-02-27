@@ -1,16 +1,16 @@
-import { Link } from "next-view-transitions";
-import { MediaPWA } from "@/components/MediaPWA/MediaPWA";
+import { Link } from 'next-view-transitions';
+import { MediaPWA } from '@/components/MediaPWA/MediaPWA';
 
 export default function MediaPage() {
     return (
         <div>
-            <p>Media</p>
+            <p>Медиа</p>
 
             <MediaPWA />
 
             <p>
-                <Link href="/">Back</Link>
+                <Link href="/">Назад</Link>
             </p>
         </div>
-    )
+    );
 }

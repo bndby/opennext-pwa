@@ -1,16 +1,16 @@
-import { Link } from "next-view-transitions";
-import InstallPWAButton from "@/components/InstallPWAButton/InstallPWAButton";
+import { Link } from 'next-view-transitions';
+import InstallPWAButton from '@/components/InstallPWAButton/InstallPWAButton';
 
 export default function InstallPWA() {
     return (
         <div>
-            <p>Install PWA</p>
+            <p>Установка PWA</p>
 
             <InstallPWAButton />
 
             <p>
-                <Link href="/">Back</Link>
+                <Link href="/">Назад</Link>
             </p>
         </div>
-    )
+    );
 }

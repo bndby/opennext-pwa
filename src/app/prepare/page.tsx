@@ -1,9 +1,9 @@
-import { Link } from "next-view-transitions";
+import { Link } from 'next-view-transitions';
 
 export default function PreparePage() {
     return (
         <div>
-            <p>Prepare</p>
+            <p>Подготовка</p>
 
             <ol>
                 <li>
@@ -12,8 +12,8 @@ export default function PreparePage() {
             </ol>
 
             <p>
-                <Link href="/">Back</Link>
+                <Link href="/">Назад</Link>
             </p>
         </div>
-    )
+    );
 }

@@ -6,23 +6,27 @@ export default function Home() {
             <h1>Opennext PWA</h1>
 
             <p>
-                <Link href="/prepare">Prepare</Link>
+                <Link href="/prepare">Подготовка</Link>
             </p>
 
             <p>
-                <Link href="/install-pwa">Install PWA</Link>
+                <Link href="/install-pwa">Установка PWA</Link>
             </p>
 
             <p>
-                <Link href="/media">Media</Link>
+                <Link href="/media">Медиа</Link>
             </p>
 
             <p>
-                <Link href="/geolocation">Geolocation</Link>
+                <Link href="/geolocation">Геолокация</Link>
             </p>
 
             <p>
-                <Link href="/file-system">File System</Link>
+                <Link href="/file-system">Файловая система</Link>
+            </p>
+
+            <p>
+                <Link href="/nfc">NFC</Link>
             </p>
         </div>
     );

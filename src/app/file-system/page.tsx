@@ -13,6 +13,8 @@ export default function FileSystemPage() {
                     <Link href="https://developer.chrome.com/docs/capabilities/web-apis/file-system-access?hl=ru">
                         Гайд
                     </Link>
+                </li>
+                <li>
                     <Link href="https://wicg.github.io/file-system-access/">Спецификация</Link>
                 </li>
             </ul>
