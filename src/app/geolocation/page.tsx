@@ -4,12 +4,14 @@ import { Link } from 'next-view-transitions';
 export default function MediaPage() {
     return (
         <div>
-            <h1>Geolocation</h1>
+            <h1>Геолокация</h1>
+
+            <p>Пример работы с геолокацией устройства</p>
 
             <WatchLocation />
 
             <p>
-                <Link href="/">Back</Link>
+                <Link href="/">Назад</Link>
             </p>
         </div>
     );
