@@ -2,7 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 
 const useWatchLocation = (options = {}) => {
     // store location in state
-    const [location, setLocation] = useState<Pick<GeolocationCoordinates, 'latitude' | 'longitude'>>();
+    const [location, setLocation] =
+        useState<
+            Pick<
+                GeolocationCoordinates,
+                'latitude' | 'longitude' | 'altitude' | 'accuracy' | 'altitudeAccuracy' | 'heading' | 'speed'
+            >
+        >();
     // store error message in state
     const [error, setError] = useState('');
     // save the returned id from the geolocation's `watchPosition` to be able to cancel the watch instance
@@ -10,11 +16,16 @@ const useWatchLocation = (options = {}) => {
 
     // Success handler for geolocation's `watchPosition` method
     const handleSuccess = (pos: GeolocationPosition) => {
-        const { latitude, longitude } = pos.coords;
+        const { latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, speed } = pos.coords;
 
         setLocation({
             latitude,
             longitude,
+            altitude,
+            accuracy,
+            altitudeAccuracy,
+            heading,
+            speed,
         });
     };
 
