@@ -23,4 +23,5 @@ interface FileSystemFileHandle {
 
 interface NDEFReadingEvent {
     message: NDEFMessage;
+    serialNumber: string;
 }

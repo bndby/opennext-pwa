@@ -1,38 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 export default function NFCRead() {
     const [status, setStatus] = useState('');
     const [data, setData] = useState('');
+    const [isScanning, setIsScanning] = useState(false);
+    const abortController = useRef<AbortController>();
 
-    const handleScan = () => {
+    const handleStartScan = async () => {
+        setIsScanning(true);
         const reader = new window.NDEFReader();
-        reader
-            .scan()
-            .then(() => {
-                setStatus('Scan started successfully.');
-                reader.onreadingerror = () => {
-                    console.log('Cannot read data from the NFC tag. Try another one?');
-                };
-                reader.onreading = (event: NDEFReadingEvent) => {
-                    console.log('NDEF message read.');
-                    const message = event.message;
-                    for (const record of message.records) {
-                        setData((prev) => prev + '\nRecord type:  ' + record.recordType);
-                        setData((prev) => prev + '\nMIME type:    ' + record.mediaType);
-                        setData((prev) => prev + '\nRecord id:    ' + record.id);
-                    }
-                };
-            })
-            .catch((error: unknown) => {
-                console.log(`Error! Scan failed to start: ${error}.`);
-            });
+        abortController.current = new AbortController();
+
+        await reader.scan({ signal: abortController.current.signal });
+
+        setStatus((prev) => prev + '\nScan started successfully.');
+        reader.onreadingerror = () => {
+            setStatus((prev) => prev + '\nCannot read data from the NFC tag. Try another one?');
+        };
+
+        reader.onreading = (event: NDEFReadingEvent) => {
+            setStatus((prev) => prev + '\n' + event.serialNumber);
+            setStatus((prev) => prev + '\nNDEF message read.');
+            setData(event.message.records[0].data);
+        };
+    };
+
+    const handleStopScan = () => {
+        abortController.current?.abort();
+        setIsScanning(false);
     };
 
     return (
         <div>
-            <button onClick={handleScan}>Read NFC</button>
+            <button onClick={handleStartScan} disabled={isScanning}>
+                Read NFC
+            </button>
+            <button onClick={handleStopScan} disabled={!isScanning}>
+                Stop Scan
+            </button>
             <p>{status}</p>
             <pre>{data}</pre>
         </div>
