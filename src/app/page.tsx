@@ -1,9 +1,9 @@
 import { Link } from 'next-view-transitions';
-
+import { Page } from '@/components/Page/Page';
 export default function Home() {
     return (
-        <div>
-            <h1>Opennext PWA</h1>
+        <Page title="Opennext Cloudflare PWA">
+            <h1>Opennext Cloudflare PWA</h1>
 
             <p>
                 <Link href="/prepare">Подготовка</Link>
@@ -28,6 +28,6 @@ export default function Home() {
             <p>
                 <Link href="/nfc">NFC</Link>
             </p>
-        </div>
+        </Page>
     );
 }
