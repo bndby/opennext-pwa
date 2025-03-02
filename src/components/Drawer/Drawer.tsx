@@ -17,8 +17,41 @@ type DrawerListProps = {
     toggleDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
 };
 
+const MENU = [
+    {
+        label: 'Prepare',
+        href: '/prepare',
+        icon: StartIcon,
+    },
+    {
+        label: 'Install',
+        href: '/install-pwa',
+        icon: InstallMobileIcon,
+    },
+    {
+        label: 'Media',
+        href: '/media',
+        icon: CameraAltIcon,
+    },
+    {
+        label: 'Geolocation',
+        href: '/geolocation',
+        icon: MyLocationIcon,
+    },
+    {
+        label: 'File System',
+        href: '/file-system',
+        icon: FolderOpenIcon,
+    },
+    {
+        label: 'NFC',
+        href: '/nfc',
+        icon: NfcIcon,
+    },
+];
+
 export const DrawerList = ({ toggleDrawer }: DrawerListProps) => (
-    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
+    <Box sx={{ width: 250, marginTop: 'auto' }} role="presentation" onClick={toggleDrawer(false)}>
         <List>
             <ListItem key={`home`} disablePadding>
                 <ListItemButton LinkComponent={Link} href="/">
@@ -30,54 +63,16 @@ export const DrawerList = ({ toggleDrawer }: DrawerListProps) => (
             </ListItem>
         </List>
         <List>
-            <ListItem key={`prepare`} disablePadding>
-                <ListItemButton LinkComponent={Link} href="/prepare">
-                    <ListItemIcon>
-                        <StartIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={`Prepare`} />
-                </ListItemButton>
-            </ListItem>
-            <ListItem key={`install`} disablePadding>
-                <ListItemButton LinkComponent={Link} href="/install">
-                    <ListItemIcon>
-                        <InstallMobileIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={`Install`} />
-                </ListItemButton>
-            </ListItem>
-            <ListItem key={`media`} disablePadding>
-                <ListItemButton LinkComponent={Link} href="/media">
-                    <ListItemIcon>
-                        <CameraAltIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={`Media`} />
-                </ListItemButton>
-            </ListItem>
-            <ListItem key={`geolocation`} disablePadding>
-                <ListItemButton LinkComponent={Link} href="/geolocation">
-                    <ListItemIcon>
-                        <MyLocationIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={`Geolocation`} />
-                </ListItemButton>
-            </ListItem>
-            <ListItem key={`file-system`} disablePadding>
-                <ListItemButton LinkComponent={Link} href="/file-system">
-                    <ListItemIcon>
-                        <FolderOpenIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={`File System`} />
-                </ListItemButton>
-            </ListItem>
-            <ListItem key={`nfc`} disablePadding>
-                <ListItemButton LinkComponent={Link} href="/nfc">
-                    <ListItemIcon>
-                        <NfcIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={`NFC`} />
-                </ListItemButton>
-            </ListItem>
+            {MENU.map((item) => (
+                <ListItem key={item.label} disablePadding>
+                    <ListItemButton LinkComponent={Link} href={item.href}>
+                        <ListItemIcon>
+                            <item.icon />
+                        </ListItemIcon>
+                        <ListItemText primary={item.label} />
+                    </ListItemButton>
+                </ListItem>
+            ))}
         </List>
     </Box>
 );
@@ -95,12 +90,12 @@ export const DrawerMenu = () => {
                 edge="start"
                 color="inherit"
                 aria-label="menu"
-                sx={{ mr: 2 }}
+                sx={{ ml: 2 }}
                 onClick={toggleDrawer(true)}
             >
                 <MenuIcon />
             </IconButton>
-            <Drawer open={open} onClose={toggleDrawer(false)}>
+            <Drawer open={open} onClose={toggleDrawer(false)} anchor="right">
                 <DrawerList toggleDrawer={toggleDrawer} />
             </Drawer>
         </>

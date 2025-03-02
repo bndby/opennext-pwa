@@ -1,13 +1,14 @@
 'use client';
 
+import { Button, Stack } from '@mui/material';
 import { useState } from 'react';
 
 export default function FSOpenDir() {
     const [text, setText] = useState('');
 
     return (
-        <div>
-            <button
+        <Stack direction="row" spacing={2}>
+            <Button
                 onClick={async () => {
                     const dirHandle = await window.showDirectoryPicker();
                     const promises = [];
@@ -20,11 +21,14 @@ export default function FSOpenDir() {
                     const text = await Promise.all(promises);
                     setText(text.join('\n'));
                 }}
+                variant="contained"
             >
                 Открыть папку
-            </button>{' '}
-            <button onClick={() => setText('')}>Очистить</button>
+            </Button>
+            <Button onClick={() => setText('')} variant="outlined">
+                Очистить
+            </Button>
             <pre>{text}</pre>
-        </div>
+        </Stack>
     );
 }

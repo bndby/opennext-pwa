@@ -1,5 +1,6 @@
 'use client';
 
+import { Button, Stack } from '@mui/material';
 import { useRef, useState } from 'react';
 
 export default function NFCRead() {
@@ -34,12 +35,14 @@ export default function NFCRead() {
 
     return (
         <div>
-            <button onClick={handleStartScan} disabled={isScanning}>
-                Read NFC
-            </button>
-            <button onClick={handleStopScan} disabled={!isScanning}>
-                Stop Scan
-            </button>
+            <Stack direction="row" spacing={2}>
+                <Button onClick={handleStartScan} disabled={isScanning} variant="contained">
+                    Read NFC
+                </Button>
+                <Button onClick={handleStopScan} disabled={!isScanning} variant="contained">
+                    Stop Scan
+                </Button>
+            </Stack>
             <p>{status}</p>
             <pre>{data}</pre>
         </div>

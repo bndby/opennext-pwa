@@ -1,17 +1,13 @@
-import { Link } from 'next-view-transitions';
 import InstallPWAButton from '@/components/InstallPWAButton/InstallPWAButton';
 import { Page } from '@/components/Page/Page';
+import { Typography } from '@mui/material';
 
 export default function InstallPWA() {
     return (
         <Page title="Установка PWA">
-            <p>Установка PWA</p>
+            <Typography variant="h5">Установка PWA</Typography>
 
             <InstallPWAButton />
-
-            <p>
-                <Link href="/">Назад</Link>
-            </p>
         </Page>
     );
 }

@@ -1,33 +1,15 @@
-import { Link } from 'next-view-transitions';
 import { Page } from '@/components/Page/Page';
+import { Typography } from '@mui/material';
+
 export default function Home() {
     return (
         <Page title="Opennext Cloudflare PWA">
-            <h1>Opennext Cloudflare PWA</h1>
+            <Typography variant="h5">Opennext Cloudflare PWA</Typography>
 
-            <p>
-                <Link href="/prepare">Подготовка</Link>
-            </p>
-
-            <p>
-                <Link href="/install-pwa">Установка PWA</Link>
-            </p>
-
-            <p>
-                <Link href="/media">Медиа</Link>
-            </p>
-
-            <p>
-                <Link href="/geolocation">Геолокация</Link>
-            </p>
-
-            <p>
-                <Link href="/file-system">Файловая система</Link>
-            </p>
-
-            <p>
-                <Link href="/nfc">NFC</Link>
-            </p>
+            <Typography variant="body1">
+                Приложение для демонстрации работы возможностей PWA-приложений на базе фреймворка OpenNext и хостинга
+                Cloudflare.
+            </Typography>
         </Page>
     );
 }

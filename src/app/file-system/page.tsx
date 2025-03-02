@@ -3,12 +3,16 @@ import FSSupport from '@/components/FileSystem/FSSupport';
 import FSOpenText from '@/components/FileSystem/FSOpenText';
 import FSOpenDir from '@/components/FileSystem/FSOpenDir';
 import { Page } from '@/components/Page/Page';
+import { Typography } from '@mui/material';
 
 export default function FileSystemPage() {
     return (
         <Page title="Файловая система устройства">
-            <h1>Файловая система устройства</h1>
-            <p>Пример работы с локальной файловой системой устройства</p>
+            <Typography variant="h5">Файловая система устройства</Typography>
+
+            <FSSupport />
+
+            <Typography variant="body1">Пример работы с локальной файловой системой устройства</Typography>
 
             <ul>
                 <li>
@@ -21,13 +25,13 @@ export default function FileSystemPage() {
                 </li>
             </ul>
 
-            <FSSupport />
+            <Typography variant="body1">Открытие текстового файла:</Typography>
 
             <FSOpenText />
 
-            <FSOpenDir />
+            <Typography variant="body1">Открытие папки:</Typography>
 
-            <Link href="/">Назад</Link>
+            <FSOpenDir />
         </Page>
     );
 }

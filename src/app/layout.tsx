@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ViewTransitions } from 'next-view-transitions';
+import { CssBaseline } from '@mui/material';
 
 const APP_NAME = 'PWA App';
 const APP_DEFAULT_TITLE = 'My Awesome PWA App';
@@ -54,6 +55,7 @@ export default function RootLayout({
 }>) {
     return (
         <ViewTransitions>
+            <CssBaseline />
             <html lang="en">
                 <body className={`antialiased`}>{children}</body>
             </html>

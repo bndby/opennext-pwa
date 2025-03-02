@@ -2,12 +2,16 @@ import NFCRead from '@/components/NFC/NFCRead';
 import NFCSupport from '@/components/NFC/NFCSupport';
 import { Link } from 'next-view-transitions';
 import { Page } from '@/components/Page/Page';
+import { Typography } from '@mui/material';
 
 export default function NFCPage() {
     return (
         <Page title="NFC">
-            <h1>NFC</h1>
-            <p>Пример работы с NFC</p>
+            <Typography variant="h5">NFC</Typography>
+
+            <NFCSupport />
+
+            <Typography variant="body1">Пример работы с NFC</Typography>
 
             <ul>
                 <li>
@@ -18,11 +22,7 @@ export default function NFCPage() {
                 </li>
             </ul>
 
-            <NFCSupport />
-
             <NFCRead />
-
-            <Link href="/">Назад</Link>
         </Page>
     );
 }
