@@ -1,8 +1,9 @@
 import { Link } from 'next-view-transitions';
+import { Page } from '@/components/Page/Page';
 
 export default function PreparePage() {
     return (
-        <div>
+        <Page title="View Transition">
             <p>View Transition</p>
 
             <ol>
@@ -14,6 +15,6 @@ export default function PreparePage() {
             <p>
                 <Link href="/">Назад</Link>
             </p>
-        </div>
+        </Page>
     );
 }

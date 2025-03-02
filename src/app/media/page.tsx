@@ -1,9 +1,10 @@
 import { Link } from 'next-view-transitions';
 import { MediaPWA } from '@/components/MediaPWA/MediaPWA';
+import { Page } from '@/components/Page/Page';
 
 export default function MediaPage() {
     return (
-        <div>
+        <Page title="Медиа">
             <p>Медиа</p>
 
             <MediaPWA />
@@ -11,6 +12,6 @@ export default function MediaPage() {
             <p>
                 <Link href="/">Назад</Link>
             </p>
-        </div>
+        </Page>
     );
 }

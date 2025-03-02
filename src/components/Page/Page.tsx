@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Container, Toolbar, Typography } from '@mui/material';
 import { PropsWithChildren } from 'react';
 import { DrawerMenu } from '../Drawer/Drawer';
 
@@ -20,7 +20,7 @@ export const Page = ({ children, title }: PageProps) => {
                     </Toolbar>
                 </AppBar>
             </Box>
-            {children}
+            <Container maxWidth="lg">{children}</Container>
         </>
     );
 };

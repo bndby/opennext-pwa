@@ -1,9 +1,10 @@
+import { Page } from '@/components/Page/Page';
 import WatchLocation from '@/components/WatchLocation/WatchLocation';
 import { Link } from 'next-view-transitions';
 
 export default function MediaPage() {
     return (
-        <div>
+        <Page title="Геолокация">
             <h1>Геолокация</h1>
 
             <p>Пример работы с геолокацией устройства</p>
@@ -13,6 +14,6 @@ export default function MediaPage() {
             <p>
                 <Link href="/">Назад</Link>
             </p>
-        </div>
+        </Page>
     );
 }

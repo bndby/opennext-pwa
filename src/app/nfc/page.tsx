@@ -1,10 +1,11 @@
 import NFCRead from '@/components/NFC/NFCRead';
 import NFCSupport from '@/components/NFC/NFCSupport';
 import { Link } from 'next-view-transitions';
+import { Page } from '@/components/Page/Page';
 
 export default function NFCPage() {
     return (
-        <div>
+        <Page title="NFC">
             <h1>NFC</h1>
             <p>Пример работы с NFC</p>
 
@@ -22,6 +23,6 @@ export default function NFCPage() {
             <NFCRead />
 
             <Link href="/">Назад</Link>
-        </div>
+        </Page>
     );
 }

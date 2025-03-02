@@ -7,6 +7,11 @@ import { Link } from 'next-view-transitions';
 
 import StartIcon from '@mui/icons-material/Start';
 import InstallMobileIcon from '@mui/icons-material/InstallMobile';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import HomeIcon from '@mui/icons-material/Home';
+import NfcIcon from '@mui/icons-material/Nfc';
 
 type DrawerListProps = {
     toggleDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
@@ -15,23 +20,65 @@ type DrawerListProps = {
 export const DrawerList = ({ toggleDrawer }: DrawerListProps) => (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
         <List>
+            <ListItem key={`home`} disablePadding>
+                <ListItemButton LinkComponent={Link} href="/">
+                    <ListItemIcon>
+                        <HomeIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={`Home`} />
+                </ListItemButton>
+            </ListItem>
+        </List>
+        <List>
             <ListItem key={`prepare`} disablePadding>
                 <ListItemButton LinkComponent={Link} href="/prepare">
                     <ListItemIcon>
                         <StartIcon />
                     </ListItemIcon>
-                    <ListItemText primary={`Подготовка`} />
+                    <ListItemText primary={`Prepare`} />
+                </ListItemButton>
+            </ListItem>
+            <ListItem key={`install`} disablePadding>
+                <ListItemButton LinkComponent={Link} href="/install">
+                    <ListItemIcon>
+                        <InstallMobileIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={`Install`} />
+                </ListItemButton>
+            </ListItem>
+            <ListItem key={`media`} disablePadding>
+                <ListItemButton LinkComponent={Link} href="/media">
+                    <ListItemIcon>
+                        <CameraAltIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={`Media`} />
+                </ListItemButton>
+            </ListItem>
+            <ListItem key={`geolocation`} disablePadding>
+                <ListItemButton LinkComponent={Link} href="/geolocation">
+                    <ListItemIcon>
+                        <MyLocationIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={`Geolocation`} />
+                </ListItemButton>
+            </ListItem>
+            <ListItem key={`file-system`} disablePadding>
+                <ListItemButton LinkComponent={Link} href="/file-system">
+                    <ListItemIcon>
+                        <FolderOpenIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={`File System`} />
+                </ListItemButton>
+            </ListItem>
+            <ListItem key={`nfc`} disablePadding>
+                <ListItemButton LinkComponent={Link} href="/nfc">
+                    <ListItemIcon>
+                        <NfcIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={`NFC`} />
                 </ListItemButton>
             </ListItem>
         </List>
-        <ListItem key={`install`} disablePadding>
-            <ListItemButton>
-                <ListItemIcon>
-                    <InstallMobileIcon />
-                </ListItemIcon>
-                <ListItemText primary={`Install`} />
-            </ListItemButton>
-        </ListItem>
     </Box>
 );
 
