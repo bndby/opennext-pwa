@@ -12,6 +12,7 @@ import MyLocationIcon from '@mui/icons-material/MyLocation';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import HomeIcon from '@mui/icons-material/Home';
 import NfcIcon from '@mui/icons-material/Nfc';
+import StorageIcon from '@mui/icons-material/Storage';
 
 type DrawerListProps = {
     toggleDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
@@ -47,6 +48,11 @@ const MENU = [
         label: 'NFC',
         href: '/nfc',
         icon: NfcIcon,
+    },
+    {
+        label: 'IndexDB',
+        href: '/indexdb',
+        icon: StorageIcon,
     },
 ];
 
