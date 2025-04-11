@@ -21,7 +21,7 @@ export default function WatchLocation() {
             {location?.speed && <p>Скорость (Speed): {location?.speed}</p>}
             {error && <p>Ошибка (Error): {error}</p>}
 
-            <MapView latitude={location.latitude} longitude={location.longitude} accuracy={location.accuracy} />
+            <MapView latitude={location.latitude} longitude={location.longitude} />
         </div>
     );
 }
