@@ -3,11 +3,12 @@
 import React, { useState } from 'react';
 import { fromLonLat } from 'ol/proj';
 import 'ol/ol.css';
-import { RFeature, RGeolocation, RLayerVector, RMap, ROSM, RStyle, useOL } from 'rlayers';
+import { RFeature, RGeolocation, RLayerTile, RLayerVector, RLayerWMTS, RMap, ROSM, RStyle, useOL } from 'rlayers';
 import pin from './pin.svg';
 import { Geometry, Point } from 'ol/geom';
 import { Geolocation as OLGeoLoc } from 'ol';
 import BaseEvent from 'ol/events/Event';
+import RLayerStadia from 'rlayers/layer/RLayerStadia';
 
 export type MapViewProps = {
     latitude: number;
@@ -40,7 +41,7 @@ export const MapView = ({ latitude, longitude }: MapViewProps) => {
                         if (accuracyGeom) {
                             setAccuracy(accuracyGeom);
 
-                            map.getView().fit(accuracyGeom, {
+                            map?.getView()?.fit(accuracyGeom, {
                                 duration: 250,
                                 maxZoom: 15,
                             });
@@ -49,7 +50,8 @@ export const MapView = ({ latitude, longitude }: MapViewProps) => {
                     [map],
                 )}
             />
-            <ROSM />
+            {/* <ROSM /> */}
+            <RLayerStadia layer="osm_bright" retina={true} />
             <RLayerVector zIndex={10}>
                 <RStyle.RStyle>
                     <RStyle.RIcon src={pin.src} anchor={[0.5, 0.8]} />

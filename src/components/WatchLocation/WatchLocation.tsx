@@ -2,9 +2,16 @@
 
 import useWatchLocation from '@/hooks/useWatchLocation';
 import { MapView } from './MapView';
+import { useEffect } from 'react';
 
 export default function WatchLocation() {
-    const { location, error } = useWatchLocation();
+    const { location, error, cancelLocationWatch } = useWatchLocation();
+
+    useEffect(() => {
+        return () => {
+            cancelLocationWatch();
+        };
+    }, [cancelLocationWatch]);
 
     if (!location) {
         return <div>Loading...</div>;
