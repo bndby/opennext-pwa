@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { fromLonLat } from 'ol/proj';
 import 'ol/ol.css';
-import { RFeature, RGeolocation, RLayerTile, RLayerVector, RLayerWMTS, RMap, ROSM, RStyle, useOL } from 'rlayers';
+import { RFeature, RGeolocation, RLayerVector, RMap, RStyle, useOL } from 'rlayers';
 import pin from './pin.svg';
 import { Geometry, Point } from 'ol/geom';
 import { Geolocation as OLGeoLoc } from 'ol';
