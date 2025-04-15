@@ -32,9 +32,13 @@ declare global {
     interface Navigator {
         contacts?: ContactsManager;
     }
+    interface window {
+        ContactsManager: ContactsManager;
+    }
 }
 
 import { Button, Table, TableCell, TableRow, TableHead, TableBody } from '@mui/material';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export const ContactsRead = () => {
@@ -83,11 +87,11 @@ export const ContactsRead = () => {
                             <TableRow key={contact.tel[0]}>
                                 <TableCell>
                                     {contact.icon.length > 0 && (
-                                        <img
+                                        <Image
                                             src={URL.createObjectURL(contact.icon[0])}
                                             alt="Contact Icon"
-                                            width="50"
-                                            height="50"
+                                            width="36"
+                                            height="36"
                                         />
                                     )}
                                 </TableCell>
