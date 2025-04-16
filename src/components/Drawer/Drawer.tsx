@@ -14,6 +14,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import NfcIcon from '@mui/icons-material/Nfc';
 import StorageIcon from '@mui/icons-material/Storage';
 import ContactsIcon from '@mui/icons-material/Contacts';
+import BarchartIcon from '@mui/icons-material/BarChart';
 
 type DrawerListProps = {
     toggleDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
@@ -59,6 +60,11 @@ const MENU = [
         label: 'Contacts',
         href: '/contacts',
         icon: ContactsIcon,
+    },
+    {
+        label: 'Barcode',
+        href: '/barcode',
+        icon: BarchartIcon,
     },
 ];
 
