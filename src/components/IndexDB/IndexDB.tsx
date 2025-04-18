@@ -1,13 +1,46 @@
 'use client';
 
-import { useIdb } from '@/hooks/useIndexDB';
 import { TextField } from '@mui/material';
 import { Button } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import setupIndexedDB, { useIndexedDBStore } from 'use-indexeddb';
+
+const idbConfig = {
+    databaseName: 'opennext-pwa',
+    version: 1,
+    stores: [
+        {
+            name: 'test-indexeddb',
+            id: { keyPath: 'id', autoIncrement: false },
+            indices: [{ name: 'content', keyPath: 'content' }],
+        },
+    ],
+};
 
 export const IndexDB = () => {
-    const [value, setValue] = useIdb('test', '{}');
-    const [rawValue, setRawValue] = useState(JSON.stringify(value));
+    useEffect(() => {
+        setupIndexedDB(idbConfig)
+            .then(() => console.log('success'))
+            .catch((e) => console.error('error / unsupported', e));
+    }, []);
+
+    const { update, getByID } = useIndexedDBStore<{ content: string }>('test-indexeddb');
+
+    const [content, setContent] = useState('');
+
+    const handleSave = () => {
+        update({
+            content: content,
+        });
+    };
+
+    const handleLoad = () => {
+        getByID(1).then((data: { content: string }) => {
+            if (data && typeof data.content === 'string') {
+                setContent(data.content);
+            }
+        });
+    };
 
     return (
         <>
@@ -16,16 +49,20 @@ export const IndexDB = () => {
                 multiline
                 minRows={3}
                 maxRows={10}
-                label="JSON"
+                label="Text"
                 variant="outlined"
-                value={rawValue}
-                onChange={(e) => setRawValue(e.target.value)}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
             />
 
             <hr />
 
-            <Button variant="contained" color="primary" onClick={() => setValue(JSON.parse(rawValue))}>
+            <Button variant="contained" color="primary" onClick={handleSave}>
                 Save
+            </Button>
+
+            <Button variant="contained" color="primary" onClick={handleLoad}>
+                Load
             </Button>
         </>
     );

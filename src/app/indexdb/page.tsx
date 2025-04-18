@@ -7,6 +7,13 @@ export default function PreparePage() {
         <Page title="IndexDB">
             <Typography variant="h5">IndexDB</Typography>
 
+            <p>
+                Для работы с IndexedDB используется библиотека{' '}
+                <a href="https://github.com/hc-oss/use-indexeddb">
+                    <code>use-indexeddb</code>
+                </a>
+            </p>
+
             <IndexDB />
         </Page>
     );

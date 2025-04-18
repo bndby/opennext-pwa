@@ -18,10 +18,15 @@ interface DetectedBarcode {
     cornerPoints: { x: number; y: number }[];
 }
 
+// Параметры конструктора BarcodeDetector
+interface BarcodeDetectorOptions {
+    formats: string[];
+}
+
 declare global {
     interface Window {
         BarcodeDetector: {
-            new (): BarcodeDetectorInterface;
+            new (options?: BarcodeDetectorOptions): BarcodeDetectorInterface;
             getSupportedFormats(): Promise<string[]>;
         };
     }
