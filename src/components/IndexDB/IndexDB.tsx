@@ -1,6 +1,6 @@
 'use client';
 
-import { TextField } from '@mui/material';
+import { Stack, TextField } from '@mui/material';
 import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import setupIndexedDB, { useIndexedDBStore } from 'use-indexeddb';
@@ -10,8 +10,8 @@ const idbConfig = {
     version: 1,
     stores: [
         {
-            name: 'test-indexeddb',
-            id: { keyPath: 'id', autoIncrement: false },
+            name: 'test',
+            id: { keyPath: 'id', autoIncrement: true },
             indices: [{ name: 'content', keyPath: 'content' }],
         },
     ],
@@ -24,22 +24,25 @@ export const IndexDB = () => {
             .catch((e) => console.error('error / unsupported', e));
     }, []);
 
-    const { update, getByID } = useIndexedDBStore<{ content: string }>('test-indexeddb');
+    const { add, getAll } = useIndexedDBStore<{ content: string }>('test');
 
     const [content, setContent] = useState('');
 
     const handleSave = () => {
-        update({
+        add({
             content: content,
-        });
+        })
+            .then((d) => console.log(`Added with ID ${d}`))
+            .catch(console.error);
     };
 
     const handleLoad = () => {
-        getByID(1).then((data: { content: string }) => {
-            if (data && typeof data.content === 'string') {
-                setContent(data.content);
-            }
-        });
+        getAll()
+            .then((data) => {
+                const str = data.map((d) => d.content).join('\n');
+                setContent(str);
+            })
+            .catch(console.error);
     };
 
     return (
@@ -54,16 +57,15 @@ export const IndexDB = () => {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
             />
-
-            <hr />
-
-            <Button variant="contained" color="primary" onClick={handleSave}>
-                Save
-            </Button>
-
-            <Button variant="contained" color="primary" onClick={handleLoad}>
-                Load
-            </Button>
+            <br />
+            <Stack spacing={2} direction="row" sx={{ marginTop: 2 }}>
+                <Button variant="contained" color="primary" onClick={handleSave}>
+                    Save
+                </Button>{' '}
+                <Button variant="contained" color="primary" onClick={handleLoad}>
+                    Load
+                </Button>
+            </Stack>
         </>
     );
 };
