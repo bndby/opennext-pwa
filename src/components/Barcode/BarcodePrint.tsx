@@ -27,7 +27,7 @@ export const BarcodePrint = ({ barcode, format }: BarcodePrintProps) => {
         if (BARCODE_FORMATS[format]) {
             JsBarcode('.barcode').init();
         }
-    }, []);
+    }, [barcode, format]);
 
     return (
         <svg

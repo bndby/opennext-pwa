@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Chip } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import useBarcodeSupported from './useBarcodeSupported';
 
 // Определение типа для BarcodeDetector API
 interface BarcodeDetectorInterface {
@@ -33,16 +33,7 @@ declare global {
 }
 
 export default function BarcodeSupport() {
-    const [isSupported, setIsSupported] = useState(false);
-    const [supportedFormats, setSupportedFormats] = useState<string[]>([]);
-    useEffect(() => {
-        if ('BarcodeDetector' in window) {
-            setIsSupported(true);
-            window.BarcodeDetector.getSupportedFormats().then((supportedFormats: string[]) => {
-                setSupportedFormats(supportedFormats);
-            });
-        }
-    }, []);
+    const [isSupported, supportedFormats] = useBarcodeSupported();
 
     return (
         <div>
