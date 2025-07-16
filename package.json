@@ -3,16 +3,18 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev --experimental-https",
+        "dev": "next dev --experimental-https --turbopack",
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "deploy": "opennextjs-cloudflare build && wrangler deploy",
-        "preview": "opennextjs-cloudflare preview && wrangler dev",
+        "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+        "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+        "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
         "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
         "format": "prettier --write ./src"
     },
     "dependencies": {
+        "@opennextjs/cloudflare": "^1.5.1",
         "@ducanh2912/next-pwa": "^10.2.9",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.1",
@@ -20,26 +22,25 @@
         "@mui/icons-material": "^7.2.0",
         "@mui/material": "^7.2.0",
         "jsbarcode": "^3.12.1",
-        "next": "15.4.1",
+        "next": "15.3.5",
         "next-view-transitions": "0.3.4",
         "ol": "^10.6.1",
-        "react": "^18.3.1",
-        "react-dom": "^18.3.1",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
         "rlayers": "^3.7.1",
         "use-indexeddb": "^2.0.2"
     },
     "devDependencies": {
         "@cloudflare/workers-types": "^4.20250715.0",
-        "@opennextjs/cloudflare": "^1.5.1",
         "@types/node": "^24",
         "@types/react": "^18",
         "@types/react-dom": "^18",
         "eslint": "^9",
-        "eslint-config-next": "^15.4.1",
+        "@eslint/eslintrc": "^3",
+        "eslint-config-next": "15.3.5",
         "postcss": "^8",
         "prettier": "^3.6.2",
         "typescript": "^5",
-        "webpack": "^5.100.2",
-        "wrangler": "^4.24.3"
+        "wrangler": "^4.24.4"
     }
 }

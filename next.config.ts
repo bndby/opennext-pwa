@@ -1,15 +1,14 @@
-/** @type {import('next').NextConfig} */
-
-import withPWAInit from "@ducanh2912/next-pwa";
+import type { NextConfig } from 'next';
+import withPWAInit from '@ducanh2912/next-pwa';
 
 const withPWA = withPWAInit({
-  dest: "public",
-  workboxOptions: {
-    disableDevLogs: true,
-  }
+    dest: 'public',
+    workboxOptions: {
+        disableDevLogs: true,
+    },
 });
 
-const nextConfig = {};
+const nextConfig: NextConfig = {};
 
 export default withPWA(nextConfig);
 
