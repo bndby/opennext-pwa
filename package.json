@@ -7,8 +7,8 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "deploy": "opennextjs-cloudflare && wrangler deploy",
-        "preview": "opennextjs-cloudflare && wrangler dev",
+        "deploy": "opennextjs-cloudflare build && wrangler deploy",
+        "preview": "opennextjs-cloudflare preview && wrangler dev",
         "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
         "format": "prettier --write ./src"
     },
