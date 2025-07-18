@@ -15,6 +15,7 @@ import NfcIcon from '@mui/icons-material/Nfc';
 import StorageIcon from '@mui/icons-material/Storage';
 import ContactsIcon from '@mui/icons-material/Contacts';
 import BarchartIcon from '@mui/icons-material/BarChart';
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 
 type DrawerListProps = {
     toggleDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
@@ -27,22 +28,22 @@ const MENU = [
         icon: StartIcon,
     },
     {
-        label: 'Install',
+        label: 'Установка',
         href: '/install-pwa',
         icon: InstallMobileIcon,
     },
     {
-        label: 'Media',
+        label: 'Медиа',
         href: '/media',
         icon: CameraAltIcon,
     },
     {
-        label: 'Geolocation',
+        label: 'Геолокация',
         href: '/geolocation',
         icon: MyLocationIcon,
     },
     {
-        label: 'File System',
+        label: 'Файловая система',
         href: '/file-system',
         icon: FolderOpenIcon,
     },
@@ -57,14 +58,19 @@ const MENU = [
         icon: StorageIcon,
     },
     {
-        label: 'Contacts',
+        label: 'Контакты',
         href: '/contacts',
         icon: ContactsIcon,
     },
     {
-        label: 'Barcode',
+        label: 'Штрихкоды',
         href: '/barcode',
         icon: BarchartIcon,
+    },
+    {
+        label: 'Генерация голоса',
+        href: '/speech-synthesis',
+        icon: RecordVoiceOverIcon,
     },
 ];
 
