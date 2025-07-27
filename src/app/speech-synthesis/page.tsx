@@ -1,4 +1,5 @@
 import { Page } from '@/components/Page/Page';
+import { Speech } from '@/components/SpeechSynthesis/Speech';
 import { Typography } from '@mui/material';
 
 export default function SpeechSynthesisPage() {
@@ -10,6 +11,8 @@ export default function SpeechSynthesisPage() {
                 Пример работы с{' '}
                 <a href="https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis">SpeechSynthesis</a>.
             </p>
+
+            <Speech />
         </Page>
     );
 }
