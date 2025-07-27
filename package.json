@@ -14,7 +14,7 @@
         "format": "prettier --write ./src"
     },
     "dependencies": {
-        "@opennextjs/cloudflare": "^1.5.1",
+        "@opennextjs/cloudflare": "^1.6.1",
         "@ducanh2912/next-pwa": "^10.2.9",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.1",
@@ -22,25 +22,25 @@
         "@mui/icons-material": "^7.2.0",
         "@mui/material": "^7.2.0",
         "jsbarcode": "^3.12.1",
-        "next": "15.3.5",
+        "next": "15.3.1",
         "next-view-transitions": "0.3.4",
         "ol": "^10.6.1",
-        "react": "^19.0.0",
-        "react-dom": "^19.0.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
         "rlayers": "^3.7.1",
         "use-indexeddb": "^2.0.2"
     },
     "devDependencies": {
-        "@cloudflare/workers-types": "^4.20250715.0",
+        "@cloudflare/workers-types": "^4.20250726.0",
         "@types/node": "^24",
         "@types/react": "^18",
         "@types/react-dom": "^18",
         "eslint": "^9",
         "@eslint/eslintrc": "^3",
-        "eslint-config-next": "15.3.5",
+        "eslint-config-next": "15.3.1",
         "postcss": "^8",
         "prettier": "^3.6.2",
         "typescript": "^5",
-        "wrangler": "^4.24.4"
+        "wrangler": "^4.26.0"
     }
 }
