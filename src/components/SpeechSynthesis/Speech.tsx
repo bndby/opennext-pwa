@@ -1,17 +1,25 @@
 'use client';
 
+import { useState } from 'react';
+
 export const Speech = () => {
+    const [text, setText] = useState('');
     return (
         <div>
-            <h1>Speech Synthesis</h1>
+            <input type="text" value={text} onChange={(e) => setText(e.target.value)} />
             <button
                 onClick={() => {
-                    const synth = window.speechSynthesis;
-                    const utterance = new SpeechSynthesisUtterance('Hello, world! Привет, мир!');
-                    synth.speak(utterance);
+                    if ('speechSynthesis' in window) {
+                        const synth = window.speechSynthesis;
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        utterance.onend = () => {
+                            setText('');
+                        };
+                        synth.speak(utterance);
+                    }
                 }}
             >
-                Hello, world! Привет, мир!
+                📢 Озвучить
             </button>
         </div>
     );

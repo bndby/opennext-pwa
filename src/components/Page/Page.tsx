@@ -1,3 +1,5 @@
+'use client';
+
 import { AppBar, Paper, Toolbar, Typography } from '@mui/material';
 import { PropsWithChildren } from 'react';
 import { DrawerMenu } from '../Drawer/Drawer';
