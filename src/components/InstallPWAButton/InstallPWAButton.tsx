@@ -2,6 +2,7 @@
 
 import { useAddToHomescreenPrompt } from '@/hooks/useAddToHomescreenPrompt';
 import { useEffect, useState } from 'react';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material';
 
 export default function InstallPWAButton() {
     const [prompt, promptToInstall] = useAddToHomescreenPrompt();
@@ -16,14 +17,33 @@ export default function InstallPWAButton() {
     }, [prompt]);
 
     if (!isVisible) {
-        return <div />;
+        return null;
     }
 
     return (
-        <div onClick={hide}>
-            <button onClick={hide}>Close</button>
-            Hello! Wanna add to homescreen?
-            <button onClick={promptToInstall}>Add to homescreen</button>
-        </div>
+        <Dialog open={isVisible} onClose={hide} aria-labelledby="install-pwa-dialog-title">
+            <DialogTitle id="install-pwa-dialog-title">Установить приложение</DialogTitle>
+            <DialogContent>
+                <Typography variant="body1">
+                    Хотите установить это приложение на главный экран для быстрого доступа?
+                </Typography>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={hide} color="secondary">
+                    Отмена
+                </Button>
+                <Button
+                    onClick={() => {
+                        promptToInstall();
+                        hide();
+                    }}
+                    variant="contained"
+                    color="primary"
+                    autoFocus
+                >
+                    Установить
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 }

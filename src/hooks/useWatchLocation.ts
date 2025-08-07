@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 const useWatchLocation = (options = {}) => {
     // store location in state
@@ -15,7 +15,7 @@ const useWatchLocation = (options = {}) => {
     const locationWatchId = useRef<number | null>(null);
 
     // Success handler for geolocation's `watchPosition` method
-    const handleSuccess = (pos: GeolocationPosition) => {
+    const handleSuccess = useCallback((pos: GeolocationPosition) => {
         const { latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, speed } = pos.coords;
 
         setLocation({
@@ -27,21 +27,21 @@ const useWatchLocation = (options = {}) => {
             heading,
             speed,
         });
-    };
+    }, []);
 
     // Error handler for geolocation's `watchPosition` method
-    const handleError = (error: GeolocationPositionError) => {
+    const handleError = useCallback((error: GeolocationPositionError) => {
         setError(error.message);
-    };
+    }, []);
 
     // Clears the watch instance based on the saved watch id
-    const cancelLocationWatch = () => {
+    const cancelLocationWatch = useCallback(() => {
         const { geolocation } = navigator;
 
         if (locationWatchId.current && geolocation) {
             geolocation.clearWatch(locationWatchId.current);
         }
-    };
+    }, []);
 
     useEffect(() => {
         const { geolocation } = navigator;
@@ -57,7 +57,7 @@ const useWatchLocation = (options = {}) => {
 
         // Clear the location watch instance when React unmounts the used component
         return cancelLocationWatch;
-    }, [options]);
+    }, [options, handleSuccess, handleError, cancelLocationWatch]);
 
     return { location, cancelLocationWatch, error };
 };

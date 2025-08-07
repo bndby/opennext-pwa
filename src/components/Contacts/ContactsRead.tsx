@@ -32,7 +32,7 @@ declare global {
     interface Navigator {
         contacts?: ContactsManager;
     }
-    interface window {
+    interface Window {
         ContactsManager: ContactsManager;
     }
 }

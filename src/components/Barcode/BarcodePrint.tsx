@@ -25,7 +25,10 @@ export const BARCODE_FORMATS: { [key: string]: string } = {
 export const BarcodePrint = ({ barcode, format }: BarcodePrintProps) => {
     useEffect(() => {
         if (BARCODE_FORMATS[format]) {
-            JsBarcode('.barcode').init();
+            const barcodeElement = document.querySelector('.barcode');
+            if (barcodeElement) {
+                JsBarcode('.barcode').init();
+            }
         }
     }, [barcode, format]);
 

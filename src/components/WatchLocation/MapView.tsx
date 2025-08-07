@@ -5,7 +5,7 @@ import { fromLonLat } from 'ol/proj';
 import 'ol/ol.css';
 import { RFeature, RGeolocation, RLayerVector, RMap, RStyle, useOL } from 'rlayers';
 import pin from './pin.svg';
-import { Geometry, Point } from 'ol/geom';
+import { Point } from 'ol/geom';
 import { Geolocation as OLGeoLoc } from 'ol';
 import BaseEvent from 'ol/events/Event';
 import RLayerStadia from 'rlayers/layer/RLayerStadia';
@@ -19,7 +19,7 @@ export const MapView = ({ latitude, longitude }: MapViewProps) => {
     const center = fromLonLat([longitude, latitude]);
 
     const [pos, setPos] = useState(new Point(fromLonLat([longitude, latitude])));
-    const [accuracy, setAccuracy] = useState(undefined as Geometry | undefined);
+    const [accuracy, setAccuracy] = useState(undefined as Point | undefined);
     // Low-level access to the OpenLayers API
     const { map } = useOL();
 

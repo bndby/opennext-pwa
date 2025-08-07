@@ -73,9 +73,9 @@ export const BarcodeDetect = () => {
 
         // detect barcodes
         if (videoRef.current) {
-            const barcodes = await barcodeDetector.detect(videoRef.current);
-            setMessages((prev) => prev + '\n' + 'Barcodes detected: ' + barcodes.length);
-            setBarcodes(barcodes);
+            const detectedBarcodes = await barcodeDetector.detect(videoRef.current);
+            setMessages((prev) => prev + '\n' + 'Barcodes detected: ' + detectedBarcodes.length);
+            setBarcodes(detectedBarcodes);
         }
     };
 
