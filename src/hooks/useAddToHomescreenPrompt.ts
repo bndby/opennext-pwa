@@ -11,7 +11,7 @@ interface IBeforeInstallPromptEvent extends Event {
 
 export function useAddToHomescreenPrompt(): [IBeforeInstallPromptEvent | null, () => void] {
     const [prompt, setState] = React.useState<IBeforeInstallPromptEvent | null>(null);
-    const [isClient, setIsClient] = React.useState(false);
+    const [, setIsClient] = React.useState(false);
 
     const promptToInstall = () => {
         if (prompt) {
