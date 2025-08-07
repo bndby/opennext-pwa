@@ -29,11 +29,10 @@ export const IndexDB = () => {
                 setIsInitialized(true);
             })
             .catch((e) => {
-                console.error('IndexedDB initialization error:', e);
-                setError('Ошибка инициализации IndexedDB: ' + e.message);
+                console.error('Ошибка инициализации IndexedDB:', e);
+                setError('Не удалось инициализировать базу данных. Попробуйте обновить страницу.');
             });
     }, []);
-
     const { add, getAll } = useIndexedDBStore<{ content: string }>('test');
 
     const [content, setContent] = useState('');

@@ -33,7 +33,8 @@ declare global {
         contacts?: ContactsManager;
     }
     interface Window {
-        ContactsManager: ContactsManager;
+        /** Конструктор Contacts API, может отсутствовать */
+        ContactsManager?: { new (): ContactsManager };
     }
 }
 

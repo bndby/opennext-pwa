@@ -73,7 +73,15 @@ export const BarcodeDetect = () => {
 
         // detect barcodes
         if (videoRef.current) {
-            const detectedBarcodes = await barcodeDetector.detect(videoRef.current);
+            // Perform barcode detection with error handling
+            let detectedBarcodes: DetectedBarcode[] = [];
+            try {
+                detectedBarcodes = await barcodeDetector.detect(videoRef.current);
+            } catch (err) {
+                setMessages((prev) => `${prev}${prev ? '\n' : ''}Detection error: ${(err as Error).message}`);
+                return;
+            }
+
             setMessages((prev) => prev + '\n' + 'Barcodes detected: ' + detectedBarcodes.length);
             setBarcodes(detectedBarcodes);
         }
