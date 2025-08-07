@@ -11,6 +11,8 @@ const useWatchLocation = (options = {}) => {
         >();
     // store error message in state
     const [error, setError] = useState('');
+    const [isSupported, setIsSupported] = useState(false);
+    const [isClient, setIsClient] = useState(false);
     // save the returned id from the geolocation's `watchPosition` to be able to cancel the watch instance
     const locationWatchId = useRef<number | null>(null);
 
@@ -44,6 +46,9 @@ const useWatchLocation = (options = {}) => {
     }, []);
 
     useEffect(() => {
+        setIsClient(true);
+        setIsSupported('geolocation' in navigator);
+        
         const { geolocation } = navigator;
 
         // If the geolocation is not defined in the used browser we handle it as an error
@@ -59,7 +64,7 @@ const useWatchLocation = (options = {}) => {
         return cancelLocationWatch;
     }, [options, handleSuccess, handleError, cancelLocationWatch]);
 
-    return { location, cancelLocationWatch, error };
+    return { location, cancelLocationWatch, error, isSupported, isClient };
 };
 
 export default useWatchLocation;

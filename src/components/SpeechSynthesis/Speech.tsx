@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useBrowserSupport } from '@/hooks/useClientSide';
 
 export const Speech = () => {
     const [text, setText] = useState('');
-    const [isSupported] = useState(() => 'speechSynthesis' in window);
+    const [isClient, isSupported] = useBrowserSupport('speechSynthesis');
 
     const handleSpeak = () => {
         if (!isSupported) {
@@ -30,6 +31,11 @@ export const Speech = () => {
 
         synth.speak(utterance);
     };
+
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return <div>Загрузка...</div>;
+    }
 
     return (
         <div>

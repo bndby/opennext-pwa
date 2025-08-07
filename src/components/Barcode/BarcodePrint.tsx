@@ -1,5 +1,5 @@
 import JsBarcode from 'jsbarcode';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export type BarcodePrintProps = {
     barcode: string;
@@ -23,14 +23,25 @@ export const BARCODE_FORMATS: { [key: string]: string } = {
 };
 
 export const BarcodePrint = ({ barcode, format }: BarcodePrintProps) => {
+    const [isClient, setIsClient] = useState(false);
+
     useEffect(() => {
-        if (BARCODE_FORMATS[format]) {
+        setIsClient(true);
+    }, []);
+
+    useEffect(() => {
+        if (isClient && BARCODE_FORMATS[format]) {
             const barcodeElement = document.querySelector('.barcode');
             if (barcodeElement) {
                 JsBarcode('.barcode').init();
             }
         }
-    }, [barcode, format]);
+    }, [barcode, format, isClient]);
+
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return <div>Загрузка...</div>;
+    }
 
     return (
         <svg

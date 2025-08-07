@@ -6,7 +6,12 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { useNetworkStatus } from './useNetworkStatus';
 
 export const NetworkStatus = () => {
-    const isOnline = useNetworkStatus();
+    const { isOnline, isClient } = useNetworkStatus();
+
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return <div>Загрузка...</div>;
+    }
 
     return (
         <div>

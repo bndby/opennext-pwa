@@ -5,13 +5,22 @@ import { MapView } from './MapView';
 import { useEffect } from 'react';
 
 export default function WatchLocation() {
-    const { location, error, cancelLocationWatch } = useWatchLocation();
+    const { location, error, cancelLocationWatch, isSupported, isClient } = useWatchLocation();
 
     useEffect(() => {
         return () => {
             cancelLocationWatch();
         };
     }, [cancelLocationWatch]);
+
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return <div>Загрузка...</div>;
+    }
+
+    if (!isSupported) {
+        return <div>Geolocation не поддерживается в вашем браузере</div>;
+    }
 
     if (!location) {
         return <div>Loading...</div>;

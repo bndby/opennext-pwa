@@ -2,7 +2,7 @@ import createCache from '@emotion/cache';
 
 const isBrowser = typeof document !== 'undefined';
 
-// Создаем кэш для Emotion на стороне клиента
+// Создаем кэш для Emotion
 export default function createEmotionCache() {
     let insertionPoint;
 
@@ -11,5 +11,9 @@ export default function createEmotionCache() {
         insertionPoint = emotionInsertionPoint ?? undefined;
     }
 
-    return createCache({ key: 'mui-style', insertionPoint });
+    return createCache({ 
+        key: 'mui-style', 
+        insertionPoint,
+        prepend: true,
+    });
 }

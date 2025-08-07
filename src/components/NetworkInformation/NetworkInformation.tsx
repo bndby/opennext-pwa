@@ -3,7 +3,16 @@
 import { useNetworkStatus } from './useNetworkInformation';
 
 export const NetworkInformation = () => {
-    const connection = useNetworkStatus();
+    const { connection, isSupported, isClient } = useNetworkStatus();
+
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return <div>Загрузка...</div>;
+    }
+
+    if (!isSupported) {
+        return <div>Network Information API не поддерживается в вашем браузере</div>;
+    }
 
     if (!connection) {
         return <div>No connection</div>;

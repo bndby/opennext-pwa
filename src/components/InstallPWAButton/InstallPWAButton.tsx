@@ -7,6 +7,11 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography }
 export default function InstallPWAButton() {
     const [prompt, promptToInstall] = useAddToHomescreenPrompt();
     const [isVisible, setVisibleState] = useState(false);
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const hide = () => setVisibleState(false);
 
@@ -15,6 +20,11 @@ export default function InstallPWAButton() {
             setVisibleState(true);
         }
     }, [prompt]);
+
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return null;
+    }
 
     if (!isVisible) {
         return null;

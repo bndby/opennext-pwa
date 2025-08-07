@@ -2,14 +2,21 @@
 
 import { Button, Stack } from '@mui/material';
 import { useRef, useState } from 'react';
+import { useBrowserSupport } from '@/hooks/useClientSide';
 
 export default function NFCRead() {
     const [status, setStatus] = useState('');
     const [data, setData] = useState('');
     const [isScanning, setIsScanning] = useState(false);
+    const [isClient, isSupported] = useBrowserSupport('NDEFReader');
     const abortController = useRef<AbortController>();
 
     const handleStartScan = async () => {
+        if (!isSupported) {
+            setStatus('NFC не поддерживается в вашем браузере');
+            return;
+        }
+
         setIsScanning(true);
         const reader = new window.NDEFReader();
         abortController.current = new AbortController();
@@ -33,10 +40,15 @@ export default function NFCRead() {
         setIsScanning(false);
     };
 
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return <div>Загрузка...</div>;
+    }
+
     return (
         <div>
             <Stack direction="row" spacing={2}>
-                <Button onClick={handleStartScan} disabled={isScanning} variant="contained">
+                <Button onClick={handleStartScan} disabled={isScanning || !isSupported} variant="contained">
                     Read NFC
                 </Button>
                 <Button onClick={handleStopScan} disabled={!isScanning} variant="contained">
@@ -45,6 +57,7 @@ export default function NFCRead() {
             </Stack>
             <p>{status}</p>
             <pre>{data}</pre>
+            {!isSupported && <p style={{ color: 'red' }}>NFC не поддерживается в вашем браузере</p>}
         </div>
     );
 }

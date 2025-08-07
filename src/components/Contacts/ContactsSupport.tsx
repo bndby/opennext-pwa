@@ -1,18 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Chip } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import { useBrowserSupport } from '@/hooks/useClientSide';
 
 export default function ContactsSupport() {
-    const [isSupported, setIsSupported] = useState(false);
+    const [isClient, isSupported] = useBrowserSupport('contacts');
 
-    useEffect(() => {
-        if ('contacts' in navigator && 'ContactsManager' in window) {
-            setIsSupported(true);
-        }
-    }, []);
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return <div>Загрузка...</div>;
+    }
 
     return (
         <div>

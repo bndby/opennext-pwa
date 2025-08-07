@@ -59,7 +59,7 @@ export default function RootLayout({
                 <head>
                     <meta name="emotion-insertion-point" content="" />
                 </head>
-                <body className={`antialiased`}>
+                <body className="antialiased">
                     <MUIProvider>{children}</MUIProvider>
                 </body>
             </html>

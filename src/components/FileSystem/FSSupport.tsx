@@ -1,18 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { Chip } from '@mui/material';
+import { useBrowserSupport } from '@/hooks/useClientSide';
 
 export default function FSSupport() {
-    const [isSupported, setIsSupported] = useState(false);
+    const [isClient, isSupported] = useBrowserSupport('showOpenFilePicker');
 
-    useEffect(() => {
-        if ('showOpenFilePicker' in self) {
-            setIsSupported(true);
-        }
-    }, []);
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return <div>Загрузка...</div>;
+    }
 
     return (
         <div>

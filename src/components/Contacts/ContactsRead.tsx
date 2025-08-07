@@ -41,33 +41,55 @@ declare global {
 import { Button, Table, TableCell, TableRow, TableHead, TableBody } from '@mui/material';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { useBrowserSupport } from '@/hooks/useClientSide';
 
 export const ContactsRead = () => {
     const [availableProps, setAvailableProps] = useState<string[]>([]);
     const [contacts, setContacts] = useState<Contact[]>([]);
+    const [isClient, isSupported] = useBrowserSupport('contacts');
 
     useEffect(() => {
         const fetchProps = async () => {
-            if ('contacts' in navigator && 'ContactsManager' in window) {
-                const props = await navigator.contacts?.getProperties();
-                setAvailableProps(props || []);
+            if (isSupported) {
+                try {
+                    const props = await navigator.contacts?.getProperties();
+                    setAvailableProps(props || []);
+                } catch (error) {
+                    console.error('Ошибка при получении свойств контактов:', error);
+                }
             }
         };
-        fetchProps();
-    }, []);
+
+        if (isSupported) {
+            fetchProps();
+        }
+    }, [isSupported]);
 
     const handleReadContacts = async () => {
-        if ('contacts' in navigator && 'ContactsManager' in window) {
+        if (!isSupported) {
+            alert('Contacts API не поддерживается в вашем браузере');
+            return;
+        }
+
+        try {
             const contacts = await navigator.contacts?.select(availableProps, { multiple: true });
             setContacts(contacts || []);
+        } catch (error) {
+            console.error('Ошибка при чтении контактов:', error);
         }
     };
 
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return <div>Загрузка...</div>;
+    }
+
     return (
         <div>
-            <Button onClick={handleReadContacts} variant="contained">
+            <Button onClick={handleReadContacts} variant="contained" disabled={!isSupported}>
                 Выбрать контакты
             </Button>
+            {!isSupported && <p style={{ color: 'red' }}>Contacts API не поддерживается в вашем браузере</p>}
             {availableProps.length > 0 && (
                 <div>
                     <h3>Доступные поля:</h3>

@@ -1,7 +1,15 @@
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore, useEffect, useState } from 'react';
 
 export const useNetworkStatus = () => {
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
     const subscribe = (callback: () => void) => {
+        if (!isClient) return () => {};
+
         window.addEventListener('online', callback);
         window.addEventListener('offline', callback);
         return () => {
@@ -11,6 +19,7 @@ export const useNetworkStatus = () => {
     };
 
     const getSnapshot = () => {
+        if (!isClient) return false;
         return navigator.onLine;
     };
 
@@ -20,5 +29,5 @@ export const useNetworkStatus = () => {
 
     const isOnline = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-    return isOnline;
+    return { isOnline, isClient };
 };

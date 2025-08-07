@@ -1,18 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Chip } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import { useBrowserSupport } from '@/hooks/useClientSide';
 
 export default function NFCSupport() {
-    const [isSupported, setIsSupported] = useState(false);
+    const [isClient, isSupported] = useBrowserSupport('NDEFReader');
 
-    useEffect(() => {
-        if ('NDEFReader' in window) {
-            setIsSupported(true);
-        }
-    }, []);
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return <div>Загрузка...</div>;
+    }
 
     return (
         <div>

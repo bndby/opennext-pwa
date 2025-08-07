@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore, useEffect, useState } from 'react';
 
 // Расширяем интерфейс Navigator для Network Information API
 interface NetworkInformation extends EventTarget {
@@ -15,7 +15,17 @@ interface NavigatorWithConnection extends Navigator {
 }
 
 export const useNetworkStatus = () => {
+    const [isClient, setIsClient] = useState(false);
+    const [isSupported, setIsSupported] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+        setIsSupported('connection' in navigator);
+    }, []);
+
     const subscribe = (callback: () => void) => {
+        if (!isSupported) return () => {};
+        
         (navigator as NavigatorWithConnection).connection?.addEventListener('change', callback);
 
         return () => {
@@ -24,6 +34,7 @@ export const useNetworkStatus = () => {
     };
 
     const getSnapshot = () => {
+        if (!isSupported) return null;
         return (navigator as NavigatorWithConnection).connection || null;
     };
 
@@ -33,5 +44,5 @@ export const useNetworkStatus = () => {
 
     const connection = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-    return connection;
+    return { connection, isSupported, isClient };
 };

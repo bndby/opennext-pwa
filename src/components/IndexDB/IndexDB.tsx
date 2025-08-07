@@ -4,6 +4,7 @@ import { Stack, TextField, Alert, CircularProgress, Typography } from '@mui/mate
 import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import setupIndexedDB, { useIndexedDBStore } from 'use-indexeddb';
+import { useBrowserSupport } from '@/hooks/useClientSide';
 
 const idbConfig = {
     databaseName: 'opennext-pwa',
@@ -21,8 +22,14 @@ export const IndexDB = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string>('');
     const [isInitialized, setIsInitialized] = useState(false);
+    const [isClient, isSupported] = useBrowserSupport('indexedDB');
 
     useEffect(() => {
+        if (!isSupported) {
+            setError('IndexedDB не поддерживается в вашем браузере');
+            return;
+        }
+
         setupIndexedDB(idbConfig)
             .then(() => {
                 console.log('IndexedDB initialized successfully');
@@ -32,7 +39,8 @@ export const IndexDB = () => {
                 console.error('Ошибка инициализации IndexedDB:', e);
                 setError('Не удалось инициализировать базу данных. Попробуйте обновить страницу.');
             });
-    }, []);
+    }, [isSupported]);
+
     const { add, getAll } = useIndexedDBStore<{ content: string }>('test');
 
     const [content, setContent] = useState('');
@@ -75,6 +83,15 @@ export const IndexDB = () => {
             setIsLoading(false);
         }
     };
+
+    // Не рендерим ничего до монтирования на клиенте
+    if (!isClient) {
+        return <div>Загрузка...</div>;
+    }
+
+    if (!isSupported) {
+        return <div>IndexedDB не поддерживается в вашем браузере</div>;
+    }
 
     if (!isInitialized) {
         return (
