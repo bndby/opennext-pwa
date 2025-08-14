@@ -20,12 +20,12 @@ export const NetworkInformation = () => {
 
     return (
         <div>
-            <p>Effective type: {connection.effectiveType}</p>
-            <p>Downlink: {connection.downlink} Mb/sec</p>
-            <p>Downlink max: {connection.downlinkMax} Mb/sec</p>
-            <p>RTT: {connection.rtt} ms</p>
-            <p>Save data: {connection.saveData ? 'Yes' : 'No'}</p>
-            <p>Type: {connection.type}</p>
+            <div>Effective type: {connection.effectiveType}</div>
+            <div>Downlink: {connection.downlink} Mb/sec</div>
+            <div>Downlink max: {connection.downlinkMax} Mb/sec</div>
+            <div>RTT: {connection.rtt} ms</div>
+            <div>Save data: {connection.saveData ? 'Yes' : 'No'}</div>
+            <div>Type: {connection.type}</div>
         </div>
     );
 };
