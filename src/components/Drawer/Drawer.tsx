@@ -17,6 +17,7 @@ import ContactsIcon from '@mui/icons-material/Contacts';
 import BarchartIcon from '@mui/icons-material/BarChart';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import CellWifiIcon from '@mui/icons-material/CellWifi';
+import ThreeDRotationIcon from '@mui/icons-material/ThreeDRotation';
 
 type DrawerListProps = {
     toggleDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
@@ -77,6 +78,11 @@ const MENU = [
         label: 'Информация о сети',
         href: '/network-information',
         icon: CellWifiIcon,
+    },
+    {
+        label: 'Акселерометр',
+        href: '/device-motion',
+        icon: ThreeDRotationIcon,
     },
 ];
 
