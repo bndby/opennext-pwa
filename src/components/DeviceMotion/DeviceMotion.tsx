@@ -10,9 +10,18 @@ export default function DeviceMotion() {
 
     useEffect(() => {
         const handleDeviceMotion = (event: DeviceMotionEvent) => {
-            setXData((prev) => [...prev, event.acceleration?.x || 0]);
-            setYData((prev) => [...prev, event.acceleration?.y || 0]);
-            setZData((prev) => [...prev, event.acceleration?.z || 0]);
+            setXData((prev) => {
+                const newData = [...prev, event.acceleration?.x || 0];
+                return newData.length > 50 ? newData.slice(-50) : newData;
+            });
+            setYData((prev) => {
+                const newData = [...prev, event.acceleration?.y || 0];
+                return newData.length > 50 ? newData.slice(-50) : newData;
+            });
+            setZData((prev) => {
+                const newData = [...prev, event.acceleration?.z || 0];
+                return newData.length > 50 ? newData.slice(-50) : newData;
+            });
         };
 
         window.addEventListener('devicemotion', handleDeviceMotion);
@@ -31,14 +40,17 @@ export default function DeviceMotion() {
                     {
                         label: 'X',
                         data: xData,
+                        showMark: false,
                     },
                     {
                         label: 'Y',
                         data: yData,
+                        showMark: false,
                     },
                     {
                         label: 'Z',
                         data: zData,
+                        showMark: false,
                     },
                 ]}
             />
