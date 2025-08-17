@@ -28,7 +28,7 @@ export default function DeviceMotion() {
                 height={300}
                 series={[{ label: 'Acceleration', data: [xData, yData, zData] }]}
                 radar={{
-                    max: 120,
+                    max: 5,
                     metrics: ['X', 'Y', 'Z'],
                 }}
             />
