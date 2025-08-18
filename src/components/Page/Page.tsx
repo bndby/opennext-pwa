@@ -11,7 +11,7 @@ type PageProps = PropsWithChildren<{
 export const Page = ({ children, title }: PageProps) => {
     return (
         <>
-            <Paper square sx={{ flexGrow: 1, padding: 2 }}>
+            <Paper square sx={{ flexGrow: 1, padding: 2, paddingBottom: 10 }}>
                 {children}
             </Paper>
             <AppBar position="fixed" sx={{ top: 'auto', bottom: 0 }}>

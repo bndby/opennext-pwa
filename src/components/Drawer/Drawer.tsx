@@ -18,6 +18,7 @@ import BarchartIcon from '@mui/icons-material/BarChart';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import CellWifiIcon from '@mui/icons-material/CellWifi';
 import ThreeDRotationIcon from '@mui/icons-material/ThreeDRotation';
+import BatteryIcon from '@mui/icons-material/BatteryFull';
 
 type DrawerListProps = {
     toggleDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
@@ -83,6 +84,11 @@ const MENU = [
         label: 'Акселерометр',
         href: '/device-motion',
         icon: ThreeDRotationIcon,
+    },
+    {
+        label: 'Батарея',
+        href: '/battery',
+        icon: BatteryIcon,
     },
 ];
 
