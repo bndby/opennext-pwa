@@ -11,7 +11,7 @@ interface BatteryManager extends EventTarget {
 
 declare global {
     interface Navigator {
-        getBattery(): BatteryManager;
+        getBattery?: () => Promise<BatteryManager>;
     }
 }
 
@@ -20,8 +20,10 @@ export const Battery = () => {
 
     useEffect(() => {
         const getBattery = async () => {
-            const battery = await navigator.getBattery();
-            setBattery(battery);
+            if (navigator.getBattery) {
+                const battery = await navigator.getBattery();
+                setBattery(battery);
+            }
         };
         getBattery();
     }, []);
