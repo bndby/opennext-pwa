@@ -2,13 +2,15 @@
 
 import { Button, Stack } from '@mui/material';
 import { useRef, useState } from 'react';
-import { useBrowserSupport } from '@/hooks/useClientSide';
+import { useBrowserSupport } from '@/hooks/useBrowserSupport';
+import { useClientSide } from '@/hooks/useClientSide';
 
 export default function NFCRead() {
     const [status, setStatus] = useState('');
     const [data, setData] = useState('');
     const [isScanning, setIsScanning] = useState(false);
-    const [isClient, isSupported] = useBrowserSupport('NDEFReader');
+    const isClient = useClientSide();
+    const isSupported = useBrowserSupport('NDEFReader');
     const abortController = useRef<AbortController>();
 
     const handleStartScan = async () => {

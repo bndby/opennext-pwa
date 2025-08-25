@@ -2,11 +2,13 @@
 
 import { Button, Stack } from '@mui/material';
 import { useState } from 'react';
-import { useBrowserSupport } from '@/hooks/useClientSide';
+import { useBrowserSupport } from '@/hooks/useBrowserSupport';
+import { useClientSide } from '@/hooks/useClientSide';
 
 export default function FSOpenDir() {
     const [text, setText] = useState('');
-    const [isClient, isSupported] = useBrowserSupport('showDirectoryPicker');
+    const isClient = useClientSide();
+    const isSupported = useBrowserSupport('showDirectoryPicker');
 
     const handleOpenDir = async () => {
         if (!isSupported) {
@@ -37,11 +39,7 @@ export default function FSOpenDir() {
 
     return (
         <Stack direction="row" spacing={2}>
-            <Button
-                onClick={handleOpenDir}
-                variant="contained"
-                disabled={!isSupported}
-            >
+            <Button onClick={handleOpenDir} variant="contained" disabled={!isSupported}>
                 Открыть папку
             </Button>
             <Button onClick={() => setText('')} variant="outlined">

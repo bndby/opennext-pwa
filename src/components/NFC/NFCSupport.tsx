@@ -3,10 +3,12 @@
 import { Chip } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import { useBrowserSupport } from '@/hooks/useClientSide';
+import { useBrowserSupport } from '@/hooks/useBrowserSupport';
+import { useClientSide } from '@/hooks/useClientSide';
 
 export default function NFCSupport() {
-    const [isClient, isSupported] = useBrowserSupport('NDEFReader');
+    const isClient = useClientSide();
+    const isSupported = useBrowserSupport('NDEFReader');
 
     // Не рендерим ничего до монтирования на клиенте
     if (!isClient) {

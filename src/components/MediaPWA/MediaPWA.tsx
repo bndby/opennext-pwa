@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useBrowserSupport } from '@/hooks/useClientSide';
+import { useBrowserSupport } from '@/hooks/useBrowserSupport';
+import { useClientSide } from '@/hooks/useClientSide';
 
 export const MediaPWA = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [error, setError] = useState<string>('');
-    const [isClient, isSupported] = useBrowserSupport('mediaDevices');
+    const isClient = useClientSide();
+    const isSupported = useBrowserSupport('mediaDevices');
 
     useEffect(() => {
         async function getMedia() {

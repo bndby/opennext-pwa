@@ -41,12 +41,14 @@ declare global {
 import { Button, Table, TableCell, TableRow, TableHead, TableBody } from '@mui/material';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { useBrowserSupport } from '@/hooks/useClientSide';
+import { useBrowserSupport } from '@/hooks/useBrowserSupport';
+import { useClientSide } from '@/hooks/useClientSide';
 
 export const ContactsRead = () => {
     const [availableProps, setAvailableProps] = useState<string[]>([]);
     const [contacts, setContacts] = useState<Contact[]>([]);
-    const [isClient, isSupported] = useBrowserSupport('contacts');
+    const isClient = useClientSide();
+    const isSupported = useBrowserSupport('contacts');
 
     useEffect(() => {
         const fetchProps = async () => {

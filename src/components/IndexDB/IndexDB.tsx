@@ -4,7 +4,8 @@ import { Stack, TextField, Alert, CircularProgress, Typography } from '@mui/mate
 import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import setupIndexedDB, { useIndexedDBStore } from 'use-indexeddb';
-import { useBrowserSupport } from '@/hooks/useClientSide';
+import { useBrowserSupport } from '@/hooks/useBrowserSupport';
+import { useClientSide } from '@/hooks/useClientSide';
 
 const idbConfig = {
     databaseName: 'opennext-pwa',
@@ -22,7 +23,8 @@ export const IndexDB = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string>('');
     const [isInitialized, setIsInitialized] = useState(false);
-    const [isClient, isSupported] = useBrowserSupport('indexedDB');
+    const isClient = useClientSide();
+    const isSupported = useBrowserSupport('indexedDB');
 
     useEffect(() => {
         if (!isSupported) {

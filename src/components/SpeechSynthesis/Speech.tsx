@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useBrowserSupport } from '@/hooks/useClientSide';
+import { useBrowserSupport } from '@/hooks/useBrowserSupport';
+import { useClientSide } from '@/hooks/useClientSide';
 
 export const Speech = () => {
     const [text, setText] = useState('');
-    const [isClient, isSupported] = useBrowserSupport('speechSynthesis');
+    const isClient = useClientSide();
+    const isSupported = useBrowserSupport('speechSynthesis');
 
     const handleSpeak = () => {
         if (!isSupported) {

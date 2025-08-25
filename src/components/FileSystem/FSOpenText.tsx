@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { Button, Stack } from '@mui/material';
-import { useBrowserSupport } from '@/hooks/useClientSide';
+import { useBrowserSupport } from '@/hooks/useBrowserSupport';
+import { useClientSide } from '@/hooks/useClientSide';
 
 export default function FSOpenText() {
     const [text, setText] = useState('');
-    const [isClient, isSupported] = useBrowserSupport('showOpenFilePicker');
+    const isClient = useClientSide();
+    const isSupported = useBrowserSupport('showOpenFilePicker');
 
     const handleOpenFile = async () => {
         if (!isSupported) {
@@ -31,11 +33,7 @@ export default function FSOpenText() {
 
     return (
         <Stack direction="row" spacing={2}>
-            <Button
-                onClick={handleOpenFile}
-                variant="contained"
-                disabled={!isSupported}
-            >
+            <Button onClick={handleOpenFile} variant="contained" disabled={!isSupported}>
                 Открыть текстовый файл
             </Button>
             <Button onClick={() => setText('')} variant="outlined">

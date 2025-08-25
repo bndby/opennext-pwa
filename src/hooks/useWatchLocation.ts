@@ -48,7 +48,7 @@ const useWatchLocation = (options = {}) => {
     useEffect(() => {
         setIsClient(true);
         setIsSupported('geolocation' in navigator);
-        
+
         const { geolocation } = navigator;
 
         // If the geolocation is not defined in the used browser we handle it as an error

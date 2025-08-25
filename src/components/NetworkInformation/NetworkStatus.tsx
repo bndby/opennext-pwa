@@ -4,9 +4,11 @@ import { Chip } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { useNetworkStatus } from './useNetworkStatus';
+import { useClientSide } from '../../hooks/useClientSide';
 
 export const NetworkStatus = () => {
-    const { isOnline, isClient } = useNetworkStatus();
+    const { isOnline } = useNetworkStatus();
+    const isClient = useClientSide();
 
     // Не рендерим ничего до монтирования на клиенте
     if (!isClient) {

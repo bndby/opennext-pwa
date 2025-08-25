@@ -25,7 +25,7 @@ export const useNetworkStatus = () => {
 
     const subscribe = (callback: () => void) => {
         if (!isSupported) return () => {};
-        
+
         (navigator as NavigatorWithConnection).connection?.addEventListener('change', callback);
 
         return () => {

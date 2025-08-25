@@ -3,10 +3,12 @@
 import { Chip } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import { useBrowserSupport } from '@/hooks/useClientSide';
+import { useBrowserSupport } from '@/hooks/useBrowserSupport';
+import { useClientSide } from '@/hooks/useClientSide';
 
 export default function ContactsSupport() {
-    const [isClient, isSupported] = useBrowserSupport('contacts');
+    const isClient = useClientSide();
+    const isSupported = useBrowserSupport('contacts');
 
     // Не рендерим ничего до монтирования на клиенте
     if (!isClient) {

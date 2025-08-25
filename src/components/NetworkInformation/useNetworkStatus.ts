@@ -1,14 +1,13 @@
-import { useSyncExternalStore, useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
-export const useNetworkStatus = () => {
-    const [isClient, setIsClient] = useState(false);
+interface NetworkStatus {
+    isOnline: boolean;
+}
 
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
-
+export const useNetworkStatus = (): NetworkStatus => {
     const subscribe = (callback: () => void) => {
-        if (!isClient) return () => {};
+        // Проверяем доступность объекта window (клиентская среда)
+        if (typeof window === 'undefined') return () => {};
 
         window.addEventListener('online', callback);
         window.addEventListener('offline', callback);
@@ -18,16 +17,18 @@ export const useNetworkStatus = () => {
         };
     };
 
-    const getSnapshot = () => {
-        if (!isClient) return false;
+    const getSnapshot = (): boolean => {
+        // Проверяем доступность navigator (клиентская среда)
+        if (typeof navigator === 'undefined') return false;
         return navigator.onLine;
     };
 
-    const getServerSnapshot = () => {
-        return false;
+    const getServerSnapshot = (): boolean => {
+        // На сервере считаем, что сеть доступна по умолчанию
+        return true;
     };
 
     const isOnline = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-    return { isOnline, isClient };
+    return { isOnline };
 };
