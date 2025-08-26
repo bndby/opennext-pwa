@@ -2,6 +2,13 @@
 
 import { useEffect, useState } from 'react';
 
+// Расширяем интерфейс Navigator для поддержки standalone свойства
+declare global {
+    interface Navigator {
+        standalone?: boolean;
+    }
+}
+
 export type PWAInstallStatus =
     | 'checking' // Проверяем статус
     | 'installed' // Приложение уже установлено
@@ -9,12 +16,84 @@ export type PWAInstallStatus =
     | 'not-supported' // Браузер не поддерживает PWA
     | 'not-installable'; // PWA не готово к установке
 
+export type DevicePlatform = 'desktop' | 'mobile' | 'tablet' | 'unknown';
+
+// Функция для определения типа устройства
+function detectDevicePlatform(): DevicePlatform {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    const isTablet = /ipad|android(?!.*mobi)/i.test(userAgent);
+
+    if (isTablet) return 'tablet';
+    if (isMobile) return 'mobile';
+
+    // Дополнительные проверки для десктопа
+    const isDesktop =
+        !isMobile &&
+        !isTablet &&
+        (userAgent.includes('windows') ||
+            userAgent.includes('macintosh') ||
+            userAgent.includes('linux') ||
+            window.screen.width >= 1024);
+
+    return isDesktop ? 'desktop' : 'unknown';
+}
+
+// Функция для определения поддержки PWA в зависимости от браузера на десктопе
+function getDesktopBrowserSupport(): { supported: boolean; recommendation?: string } {
+    const userAgent = navigator.userAgent.toLowerCase();
+
+    // Chrome и браузеры на базе Chromium (Edge, Brave, Opera)
+    if (
+        userAgent.includes('chrome') ||
+        userAgent.includes('chromium') ||
+        userAgent.includes('edg/') ||
+        userAgent.includes('brave') ||
+        userAgent.includes('opera')
+    ) {
+        return { supported: true };
+    }
+
+    // Firefox на десктопе (ограниченная поддержка)
+    if (userAgent.includes('firefox')) {
+        return {
+            supported: false,
+            recommendation: 'Firefox имеет ограниченную поддержку PWA. Рекомендуем Chrome или Edge для лучшего опыта',
+        };
+    }
+
+    // Safari на macOS (ограниченная поддержка)
+    if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
+        return {
+            supported: false,
+            recommendation: 'Safari имеет ограниченную поддержку PWA на macOS. Рекомендуем Chrome или Edge',
+        };
+    }
+
+    return {
+        supported: false,
+        recommendation: 'Для установки PWA рекомендуем использовать Chrome или Microsoft Edge',
+    };
+}
+
 export function usePWAInstallStatus() {
     const [status, setStatus] = useState<PWAInstallStatus>('checking');
     const [isClient, setIsClient] = useState(false);
+    const [platform, setPlatform] = useState<DevicePlatform>('unknown');
+    const [browserRecommendation, setBrowserRecommendation] = useState<string>('');
 
     useEffect(() => {
         setIsClient(true);
+        const detectedPlatform = detectDevicePlatform();
+        setPlatform(detectedPlatform);
+
+        // Проверяем поддержку браузера для десктопа
+        if (detectedPlatform === 'desktop') {
+            const browserSupport = getDesktopBrowserSupport();
+            if (browserSupport.recommendation) {
+                setBrowserRecommendation(browserSupport.recommendation);
+            }
+        }
     }, []);
 
     useEffect(() => {
@@ -25,7 +104,7 @@ export function usePWAInstallStatus() {
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
 
             // Проверяем для iOS Safari
-            const isIOSStandalone = (window.navigator as any).standalone === true;
+            const isIOSStandalone = 'standalone' in window.navigator && window.navigator.standalone === true;
 
             // Дополнительная проверка для Android WebView
             const isMinimalUI = window.matchMedia('(display-mode: minimal-ui)').matches;
@@ -34,7 +113,7 @@ export function usePWAInstallStatus() {
             // Проверяем referrer для PWA режима
             const referrerCheck = document.referrer === '' || document.referrer.includes('android-app://');
 
-            const isPWAMode = isStandalone || isIOSStandalone || isMinimalUI || isFullscreen;
+            const isPWAMode = isStandalone || isIOSStandalone || isMinimalUI || isFullscreen || referrerCheck;
 
             if (isPWAMode) {
                 setStatus('installed');
@@ -43,7 +122,6 @@ export function usePWAInstallStatus() {
 
             // Проверяем базовую поддержку PWA
             const hasServiceWorkerSupport = 'serviceWorker' in navigator;
-            const hasManifestSupport = 'serviceWorker' in navigator && 'PushManager' in window;
 
             if (!hasServiceWorkerSupport) {
                 setStatus('not-supported');
@@ -110,19 +188,29 @@ export function usePWAInstallStatus() {
         return cleanup;
     }, [isClient]);
 
-    // Функция для получения текстового описания статуса
+    // Функция для получения текстового описания статуса с учетом платформы
     const getStatusText = (): string => {
+        const isDesktop = platform === 'desktop';
+
         switch (status) {
             case 'checking':
                 return 'Проверяем возможность установки...';
             case 'installed':
-                return 'Приложение уже установлено';
+                return isDesktop
+                    ? 'Приложение установлено и запущено как настольное приложение'
+                    : 'Приложение уже установлено';
             case 'installable':
-                return 'Приложение можно установить';
+                return isDesktop
+                    ? 'Приложение можно установить на компьютер как настольное приложение'
+                    : 'Приложение можно установить на главный экран';
             case 'not-supported':
-                return 'Браузер не поддерживает установку PWA';
+                return isDesktop
+                    ? 'Ваш браузер не поддерживает установку PWA. Попробуйте Chrome или Edge'
+                    : 'Браузер не поддерживает установку PWA';
             case 'not-installable':
-                return 'Приложение не готово к установке';
+                return isDesktop
+                    ? 'Приложение не готово к установке на компьютер. Возможно, оно уже было установлено'
+                    : 'Приложение не готово к установке';
             default:
                 return 'Неизвестный статус';
         }
@@ -131,9 +219,14 @@ export function usePWAInstallStatus() {
     return {
         status,
         statusText: getStatusText(),
+        platform,
+        browserRecommendation,
         isInstalled: status === 'installed',
         isInstallable: status === 'installable',
         isSupported: status !== 'not-supported',
         isChecking: status === 'checking',
+        isDesktop: platform === 'desktop',
+        isMobile: platform === 'mobile',
+        isTablet: platform === 'tablet',
     };
 }

@@ -27,7 +27,7 @@ import {
 
 export default function InstallPWAButton() {
     const [prompt, promptToInstall] = useAddToHomescreenPrompt();
-    const { status, statusText, isInstalled, isInstallable } = usePWAInstallStatus();
+    const { status, statusText, isInstalled, isInstallable, browserRecommendation, isDesktop } = usePWAInstallStatus();
     const [showDialog, setShowDialog] = useState(false);
     const [isClient, setIsClient] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -122,8 +122,14 @@ export default function InstallPWAButton() {
 
                     {status === 'not-supported' && (
                         <Alert severity="error" sx={{ mb: 2 }}>
-                            Ваш браузер не поддерживает установку PWA приложений. Попробуйте использовать современный
-                            браузер, такой как Chrome, Firefox или Safari.
+                            {isDesktop
+                                ? 'Ваш браузер не поддерживает установку PWA приложений на компьютер.'
+                                : 'Ваш браузер не поддерживает установку PWA приложений.'}
+                            {browserRecommendation && (
+                                <Typography variant="body2" sx={{ mt: 1 }}>
+                                    {browserRecommendation}
+                                </Typography>
+                            )}
                         </Alert>
                     )}
 
@@ -154,7 +160,7 @@ export default function InstallPWAButton() {
                             onClick={() => setShowDialog(true)}
                             fullWidth
                         >
-                            Установить приложение
+                            {isDesktop ? 'Установить на компьютер' : 'Установить приложение'}
                         </Button>
                     </CardActions>
                 )}
@@ -162,10 +168,14 @@ export default function InstallPWAButton() {
 
             {/* Диалог подтверждения установки */}
             <Dialog open={showDialog} onClose={() => setShowDialog(false)} aria-labelledby="install-pwa-dialog-title">
-                <DialogTitle id="install-pwa-dialog-title">Установить PWA приложение</DialogTitle>
+                <DialogTitle id="install-pwa-dialog-title">
+                    {isDesktop ? 'Установить настольное приложение' : 'Установить PWA приложение'}
+                </DialogTitle>
                 <DialogContent>
                     <Typography variant="body1" sx={{ mb: 2 }}>
-                        Хотите установить это приложение на главный экран для быстрого доступа?
+                        {isDesktop
+                            ? 'Хотите установить это приложение на компьютер как настольное приложение?'
+                            : 'Хотите установить это приложение на главный экран для быстрого доступа?'}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                         После установки приложение будет:
@@ -173,8 +183,17 @@ export default function InstallPWAButton() {
                     <ul>
                         <li>Работать в автономном режиме</li>
                         <li>Загружаться быстрее</li>
-                        <li>Иметь собственную иконку на главном экране</li>
-                        <li>Работать как обычное приложение</li>
+                        <li>
+                            {isDesktop
+                                ? 'Появится в меню "Пуск" и на рабочем столе'
+                                : 'Иметь собственную иконку на главном экране'}
+                        </li>
+                        <li>
+                            {isDesktop
+                                ? 'Работать как обычная программа с собственным окном'
+                                : 'Работать как обычное приложение'}
+                        </li>
+                        {isDesktop && <li>Открываться без адресной строки браузера</li>}
                     </ul>
                     {error && (
                         <Alert severity="error" sx={{ mt: 2 }}>
