@@ -2,8 +2,20 @@ import { Page } from '@/components/Page/Page';
 import { Typography, Card, CardContent, CardActionArea, Box } from '@mui/material';
 import { Link } from 'next-view-transitions';
 import { MENU } from '@/menu';
+import { VersionInfo } from '@/components/VersionInfo/VersionInfo';
+import { getGitCommitInfo } from '@/lib/git-info';
 
 export default function Home() {
+    // Получаем информацию о коммите на сервере
+    const gitInfo = getGitCommitInfo();
+    const commitInfo = gitInfo
+        ? {
+              shortHash: gitInfo.shortHash,
+              formattedDate: gitInfo.formattedDate,
+              message: gitInfo.message,
+          }
+        : null;
+
     return (
         <Page title="Opennext Cloudflare PWA">
             <Typography variant="h4" component="h1" gutterBottom align="center">
@@ -87,6 +99,9 @@ export default function Home() {
                     </Card>
                 ))}
             </Box>
+
+            {/* Информация о версии в футере страницы */}
+            <VersionInfo commitInfo={commitInfo} placement="footer" showMessage={false} />
         </Page>
     );
 }
