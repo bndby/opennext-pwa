@@ -26,23 +26,35 @@ import {
 } from '@mui/icons-material';
 
 export default function InstallPWAButton() {
-    const [prompt, promptToInstall] = useAddToHomescreenPrompt();
+    const [, promptToInstall] = useAddToHomescreenPrompt();
     const { status, statusText, isInstalled, isInstallable, browserRecommendation, isDesktop } = usePWAInstallStatus();
     const [showDialog, setShowDialog] = useState(false);
     const [isClient, setIsClient] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isInstalling, setIsInstalling] = useState(false);
 
+    const getStatusLabel = (): string => {
+        switch (status) {
+            case 'checking':
+                return 'Проверяем...';
+            case 'installed':
+                return 'Установлено';
+            case 'installable':
+                return 'Готово к установке';
+            case 'not-supported':
+                return 'Не поддерживается';
+            case 'not-installable':
+                return 'Недоступно';
+            default:
+                return status;
+        }
+    };
+
     useEffect(() => {
         setIsClient(true);
     }, []);
 
     const handleInstall = async () => {
-        if (!prompt) {
-            setError('Установка недоступна');
-            return;
-        }
-
         try {
             setIsInstalling(true);
             setError(null);
@@ -102,11 +114,7 @@ export default function InstallPWAButton() {
                         <Typography variant="h6" component="h2">
                             Статус PWA приложения
                         </Typography>
-                        <Chip
-                            label={status === 'checking' ? 'Проверяем...' : status}
-                            color={getStatusColor()}
-                            size="small"
-                        />
+                        <Chip label={getStatusLabel()} color={getStatusColor()} size="small" />
                     </Box>
 
                     <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
@@ -141,6 +149,9 @@ export default function InstallPWAButton() {
                                 <li>Не выполнены критерии установки PWA</li>
                                 <li>Необходимо больше взаимодействий с сайтом</li>
                             </ul>
+                            <Typography variant="body2" sx={{ mt: 1, fontWeight: 'medium' }}>
+                                Совет: Попробуйте перезагрузить страницу или убедитесь, что сайт открыт по HTTPS.
+                            </Typography>
                         </Alert>
                     )}
 
@@ -211,7 +222,7 @@ export default function InstallPWAButton() {
                         color="primary"
                         autoFocus
                         disabled={isInstalling}
-                        startIcon={isInstalling ? <CircularProgress size={16} /> : <GetAppIcon />}
+                        startIcon={isInstalling ? <CircularProgress size={20} /> : <GetAppIcon />}
                     >
                         {isInstalling ? 'Устанавливаем...' : 'Установить'}
                     </Button>
