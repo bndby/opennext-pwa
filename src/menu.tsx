@@ -11,6 +11,8 @@ import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import CellWifiIcon from '@mui/icons-material/CellWifi';
 import ThreeDRotationIcon from '@mui/icons-material/ThreeDRotation';
 import BatteryIcon from '@mui/icons-material/BatteryFull';
+import TouchAppIcon from '@mui/icons-material/TouchApp';
+import VibrationIcon from '@mui/icons-material/Vibration';
 import { SvgIconComponent } from '@mui/icons-material';
 
 export interface MenuItem {
@@ -84,5 +86,15 @@ export const MENU: MenuItem[] = [
         label: 'Батарея',
         href: '/battery',
         icon: BatteryIcon,
+    },
+    {
+        label: 'Вибрация',
+        href: '/vibration',
+        icon: VibrationIcon,
+    },
+    {
+        label: 'Touch Events',
+        href: '/touch-events',
+        icon: TouchAppIcon,
     },
 ];
