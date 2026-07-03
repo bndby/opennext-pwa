@@ -109,7 +109,7 @@ export default function InstallPWAButton() {
         <>
             <Card variant="outlined" sx={{ maxWidth: 600, mx: 'auto' }}>
                 <CardContent>
-                    <Box display="flex" alignItems="center" gap={2} mb={2}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                         {getStatusIcon()}
                         <Typography variant="h6" component="h2">
                             Статус PWA приложения

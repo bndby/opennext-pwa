@@ -125,7 +125,7 @@ export const BarcodeDetect = () => {
                 style={{ objectFit: 'cover', borderRadius: 8, backgroundColor: '#111' }}
             />
 
-            <Stack direction="row" spacing={2} marginTop={2}>
+            <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
                 {isActive ? (
                     <>
                         <Button variant="contained" color="error" onClick={handleStop} disabled={isStarting || isDetecting}>

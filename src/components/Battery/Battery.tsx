@@ -40,7 +40,7 @@ export const Battery = () => {
             <Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                     <Typography variant="body2">Уровень заряда</Typography>
-                    <Typography variant="body2" fontWeight="bold">
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                         {formatBatteryLevel(battery.level)}
                     </Typography>
                 </Box>

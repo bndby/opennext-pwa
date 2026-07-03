@@ -22,7 +22,7 @@ export default function Home() {
                 Opennext Cloudflare PWA
             </Typography>
 
-            <Typography variant="body1" paragraph align="center" sx={{ mb: 4 }}>
+            <Typography variant="body1" component="p" align="center" sx={{ mb: 4 }}>
                 Приложение для демонстрации работы возможностей PWA-приложений на базе фреймворка OpenNext и хостинга
                 Cloudflare.
             </Typography>

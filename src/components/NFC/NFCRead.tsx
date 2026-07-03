@@ -11,7 +11,7 @@ export default function NFCRead() {
     const [isScanning, setIsScanning] = useState(false);
     const isClient = useClientSide();
     const isSupported = useBrowserSupport('NDEFReader');
-    const abortController = useRef<AbortController>();
+    const abortController = useRef<AbortController | null>(null);
 
     const handleStartScan = async () => {
         if (!isSupported) {

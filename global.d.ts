@@ -1,4 +1,6 @@
 // global.d.ts
+declare module '*.css';
+
 interface Window {
     showDirectoryPicker: () => Promise<FileSystemDirectoryHandle>;
     showOpenFilePicker: () => Promise<FileSystemFileHandle[]>;
