@@ -1,21 +1,30 @@
 import { Page } from '@/components/Page/Page';
-import { Typography } from '@mui/material';
+import { Link as MuiLink, Stack, Typography } from '@mui/material';
 import BarcodeSupport from '@/components/Barcode/BarcodeSupport';
 import { BarcodeDetect } from '@/components/Barcode/BarcodeDetect';
 
 export default function MediaPage() {
     return (
         <Page title="Штрихкоды">
-            <Typography variant="h5">Штрихкоды</Typography>
+            <Stack spacing={2}>
+                <Typography variant="h5">Штрихкоды</Typography>
 
-            <BarcodeSupport />
+                <BarcodeSupport />
 
-            <p>
-                Пример работы со{' '}
-                <a href="https://developer.mozilla.org/en-US/docs/Web/API/Barcode_Detection_API">штрихкодами</a>.
-            </p>
+                <Typography variant="body1">
+                    Пример работы с{' '}
+                    <MuiLink
+                        href="https://developer.mozilla.org/en-US/docs/Web/API/Barcode_Detection_API"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Barcode Detection API
+                    </MuiLink>
+                    .
+                </Typography>
 
-            <BarcodeDetect />
+                <BarcodeDetect />
+            </Stack>
         </Page>
     );
 }

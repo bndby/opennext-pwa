@@ -1,161 +1,174 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Button, Stack } from '@mui/material';
+import { Alert, Box, Button, Stack, Typography } from '@mui/material';
 import { BarcodePrint } from './BarcodePrint';
 import useBarcodeSupported from './useBarcodeSupported';
-
-// Определение типа для BarcodeDetector API
-interface BarcodeDetectorInterface {
-    getSupportedFormats(): Promise<string[]>;
-    detect(image: ImageBitmapSource): Promise<DetectedBarcode[]>;
-}
-
-interface DetectedBarcode {
-    boundingBox: DOMRectReadOnly;
-    rawValue: string;
-    format: string;
-    cornerPoints: { x: number; y: number }[];
-}
-
-// Параметры конструктора BarcodeDetector
-interface BarcodeDetectorOptions {
-    formats: string[];
-}
-
-declare global {
-    interface Window {
-        BarcodeDetector: {
-            new (options?: BarcodeDetectorOptions): BarcodeDetectorInterface;
-            getSupportedFormats(): Promise<string[]>;
-        };
-    }
-}
+import { DetectedBarcode } from './types';
 
 export const BarcodeDetect = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
 
     const [barcodes, setBarcodes] = useState<DetectedBarcode[]>([]);
-    const [messages, setMessages] = useState('');
-    const [isActive, setIsActive] = useState(true);
+    const [messages, setMessages] = useState<string[]>([]);
+    const [isActive, setIsActive] = useState(false);
+    const [isDetecting, setIsDetecting] = useState(false);
+    const [isStarting, setIsStarting] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
-    const [isSupported] = useBarcodeSupported();
+    const [isSupported, , isChecking] = useBarcodeSupported();
+
+    const appendMessage = (message: string) => {
+        setMessages((prev) => [...prev, message]);
+    };
+
+    const stopCamera = () => {
+        const video = videoRef.current;
+        if (!video) {
+            setIsActive(false);
+            return;
+        }
+        const stream = video.srcObject as MediaStream | null;
+        if (stream) {
+            stream.getTracks().forEach((track) => track.stop());
+            video.srcObject = null;
+        }
+        setIsActive(false);
+    };
+
+    const startCamera = async (): Promise<boolean> => {
+        if (!videoRef.current || isStarting) {
+            return false;
+        }
+        setIsStarting(true);
+        setErrorMessage('');
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' },
+                audio: false,
+            });
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+            } else {
+                stream.getTracks().forEach((track) => track.stop());
+            }
+            setIsActive(true);
+            return true;
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Не удалось получить доступ к камере.';
+            setErrorMessage(`Ошибка камеры: ${message}`);
+            appendMessage(`Ошибка запуска камеры: ${message}`);
+            setIsActive(false);
+            return false;
+        } finally {
+            setIsStarting(false);
+        }
+    };
 
     useEffect(() => {
-        async function getMedia() {
-            if (videoRef.current) {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' },
-                    audio: false,
-                });
-                videoRef.current.srcObject = stream;
-            }
+        if (isSupported) {
+            void startCamera();
         }
-
-        getMedia();
-
-        // Сохраняем текущее значение videoRef.current
-        const videoElement = videoRef.current;
-
         return () => {
-            if (videoElement && isActive) {
-                const stream = videoElement.srcObject as MediaStream;
-                const tracks = stream.getTracks();
-                tracks.forEach((track) => track.stop());
-                videoElement.srcObject = null;
-            }
+            stopCamera();
         };
-    }, [isActive]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isSupported]);
 
     const handleDetect = async () => {
-        // create new detector
+        if (!videoRef.current || !isActive || isDetecting) {
+            return;
+        }
+        setIsDetecting(true);
+        setErrorMessage('');
+
         const barcodeDetector = new window.BarcodeDetector();
-
-        // detect barcodes
-        if (videoRef.current) {
-            // Perform barcode detection with error handling
-            let detectedBarcodes: DetectedBarcode[] = [];
-            try {
-                detectedBarcodes = await barcodeDetector.detect(videoRef.current);
-            } catch (err) {
-                setMessages((prev) => `${prev}${prev ? '\n' : ''}Detection error: ${(err as Error).message}`);
-                return;
-            }
-
-            setMessages((prev) => prev + '\n' + 'Barcodes detected: ' + detectedBarcodes.length);
+        try {
+            const detectedBarcodes = await barcodeDetector.detect(videoRef.current);
             setBarcodes(detectedBarcodes);
+            appendMessage(`Найдено штрихкодов: ${detectedBarcodes.length}`);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Ошибка детекции штрихкодов.';
+            setErrorMessage(`Ошибка детекции: ${message}`);
+            appendMessage(`Ошибка детекции: ${message}`);
+        } finally {
+            setIsDetecting(false);
         }
     };
 
     const handleStop = () => {
-        if (videoRef.current && isActive) {
-            const stream = videoRef.current.srcObject as MediaStream;
-            const tracks = stream.getTracks();
-            tracks.forEach((track) => track.stop());
-            setIsActive(false);
+        stopCamera();
+        appendMessage('Камера остановлена.');
+    };
+
+    const handleStart = async () => {
+        const started = await startCamera();
+        if (started) {
+            appendMessage('Камера запущена.');
         }
     };
 
-    const handleStart = () => {
-        async function getMedia() {
-            if (videoRef.current) {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' },
-                    audio: false,
-                });
-                videoRef.current.srcObject = stream;
-            }
-        }
-
-        getMedia();
-        setIsActive(true);
-    };
+    if (!isSupported && !isChecking) {
+        return null;
+    }
 
     return (
-        <div>
-            {isSupported && (
-                <div>
-                    <video
-                        ref={videoRef}
-                        width="100%"
-                        height="300"
-                        playsInline
-                        autoPlay
-                        muted
-                        style={{ objectFit: 'cover' }}
-                    ></video>
-                    <Stack direction="row" spacing={2} marginTop={2}>
-                        {isActive ? (
-                            <>
-                                <Button variant="contained" color="error" onClick={handleStop}>
-                                    Stop
-                                </Button>
-                                <Button variant="contained" color="primary" onClick={handleDetect}>
-                                    Detect Barcodes
-                                </Button>
-                            </>
-                        ) : (
-                            <Button variant="contained" color="success" onClick={handleStart}>
-                                Start
-                            </Button>
-                        )}
-                    </Stack>
+        <Box>
+            <video
+                ref={videoRef}
+                width="100%"
+                height="300"
+                playsInline
+                autoPlay
+                muted
+                aria-label="Предпросмотр камеры для распознавания штрихкодов"
+                style={{ objectFit: 'cover', borderRadius: 8, backgroundColor: '#111' }}
+            />
 
-                    <div style={{ marginTop: 2 }}>
-                        {barcodes.map((barcode) => (
-                            <div key={barcode.rawValue}>
-                                <div>
-                                    {barcode.format}: {barcode.rawValue}
-                                </div>
-                                <BarcodePrint barcode={barcode.rawValue} format={barcode.format} />
-                            </div>
-                        ))}
-                    </div>
-                    <div style={{ marginTop: 2 }}>
-                        <pre style={{ fontSize: 10 }}>{messages}</pre>
-                    </div>
-                </div>
+            <Stack direction="row" spacing={2} marginTop={2}>
+                {isActive ? (
+                    <>
+                        <Button variant="contained" color="error" onClick={handleStop} disabled={isStarting || isDetecting}>
+                            Остановить
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleDetect}
+                            disabled={isStarting || isDetecting || !isActive}
+                        >
+                            {isDetecting ? 'Сканируем...' : 'Сканировать штрихкоды'}
+                        </Button>
+                    </>
+                ) : (
+                    <Button variant="contained" color="success" onClick={handleStart} disabled={isStarting}>
+                        {isStarting ? 'Запускаем...' : 'Запустить камеру'}
+                    </Button>
+                )}
+            </Stack>
+
+            {errorMessage && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                    {errorMessage}
+                </Alert>
             )}
-        </div>
+
+            <Box sx={{ mt: 2 }}>
+                {barcodes.map((barcode, index) => (
+                    <Box key={`${barcode.rawValue}-${index}`} sx={{ mb: 2 }}>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                            {barcode.format}: {barcode.rawValue}
+                        </Typography>
+                        <BarcodePrint barcode={barcode.rawValue} format={barcode.format} />
+                    </Box>
+                ))}
+            </Box>
+
+            {messages.length > 0 && (
+                <Box sx={{ mt: 2 }}>
+                    <pre style={{ fontSize: 11, margin: 0, whiteSpace: 'pre-wrap' }}>{messages.join('\n')}</pre>
+                </Box>
+            )}
+        </Box>
     );
 };

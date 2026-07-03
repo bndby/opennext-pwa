@@ -1,5 +1,5 @@
 import JsBarcode from 'jsbarcode';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 export type BarcodePrintProps = {
     barcode: string;
@@ -23,33 +23,21 @@ export const BARCODE_FORMATS: { [key: string]: string } = {
 };
 
 export const BarcodePrint = ({ barcode, format }: BarcodePrintProps) => {
-    const [isClient, setIsClient] = useState(false);
+    const svgRef = useRef<SVGSVGElement>(null);
+    const barcodeFormat = BARCODE_FORMATS[format];
 
     useEffect(() => {
-        setIsClient(true);
-    }, []);
-
-    useEffect(() => {
-        if (isClient && BARCODE_FORMATS[format]) {
-            const barcodeElement = document.querySelector('.barcode');
-            if (barcodeElement) {
-                JsBarcode('.barcode').init();
-            }
+        if (!svgRef.current || !barcodeFormat) {
+            return;
         }
-    }, [barcode, format, isClient]);
-
-    // Не рендерим ничего до монтирования на клиенте
-    if (!isClient) {
-        return <div>Загрузка...</div>;
-    }
+        JsBarcode(svgRef.current, barcode, {
+            format: barcodeFormat,
+            textMargin: 0,
+            fontOptions: 'bold',
+        });
+    }, [barcode, barcodeFormat]);
 
     return (
-        <svg
-            className="barcode"
-            jsbarcode-format={BARCODE_FORMATS[format]}
-            jsbarcode-value={barcode}
-            jsbarcode-textmargin="0"
-            jsbarcode-fontoptions="bold"
-        ></svg>
+        <svg ref={svgRef} role="img" aria-label={`Штрихкод ${barcode}`}></svg>
     );
 };
