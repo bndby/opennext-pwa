@@ -1,17 +1,28 @@
 'use client';
 
 import { Button, Stack } from '@mui/material';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useBrowserSupport } from '@/hooks/useBrowserSupport';
 import { useClientSide } from '@/hooks/useClientSide';
+import { formatNdefMessage } from '@/lib/nfc';
+import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary';
 
-export default function NFCRead() {
+function NFCReadInner() {
     const [status, setStatus] = useState('');
     const [data, setData] = useState('');
     const [isScanning, setIsScanning] = useState(false);
     const isClient = useClientSide();
     const isSupported = useBrowserSupport('NDEFReader');
     const abortController = useRef<AbortController | null>(null);
+    const readerRef = useRef<NDEFReader | null>(null);
+
+    useEffect(() => {
+        return () => {
+            abortController.current?.abort();
+            abortController.current = null;
+            readerRef.current = null;
+        };
+    }, []);
 
     const handleStartScan = async () => {
         if (!isSupported) {
@@ -20,29 +31,47 @@ export default function NFCRead() {
         }
 
         setIsScanning(true);
-        const reader = new window.NDEFReader();
-        abortController.current = new AbortController();
+        setStatus('Запуск сканирования…');
 
-        await reader.scan({ signal: abortController.current.signal });
+        try {
+            abortController.current?.abort();
+            abortController.current = new AbortController();
 
-        setStatus((prev) => prev + '\nScan started successfully.');
-        reader.onreadingerror = () => {
-            setStatus((prev) => prev + '\nCannot read data from the NFC tag. Try another one?');
-        };
+            const reader = new window.NDEFReader();
+            readerRef.current = reader;
 
-        reader.onreading = (event: NDEFReadingEvent) => {
-            setStatus((prev) => prev + '\n' + event.serialNumber);
-            setStatus((prev) => prev + '\nNDEF message read.');
-            setData(event.message.records[0].data);
-        };
+            await reader.scan({ signal: abortController.current.signal });
+
+            setStatus((prev) => prev + '\nScan started successfully.');
+
+            reader.onreadingerror = () => {
+                setStatus((prev) => prev + '\nCannot read data from the NFC tag. Try another one?');
+            };
+
+            reader.onreading = (event: NDEFReadingEvent) => {
+                setStatus((prev) => prev + `\nSerial: ${event.serialNumber}\nNDEF message read.`);
+                const records = event.message?.records ?? [];
+                setData(formatNdefMessage(records));
+            };
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Неизвестная ошибка NFC';
+            // AbortError — ожидаемый результат Stop Scan
+            if (err instanceof DOMException && err.name === 'AbortError') {
+                setStatus((prev) => prev + '\nСканирование остановлено.');
+            } else {
+                setStatus((prev) => prev + `\nОшибка: ${message}`);
+            }
+            setIsScanning(false);
+        }
     };
 
     const handleStopScan = () => {
         abortController.current?.abort();
+        abortController.current = null;
         setIsScanning(false);
+        setStatus((prev) => prev + '\nСканирование остановлено.');
     };
 
-    // Не рендерим ничего до монтирования на клиенте
     if (!isClient) {
         return <div>Загрузка...</div>;
     }
@@ -57,9 +86,17 @@ export default function NFCRead() {
                     Stop Scan
                 </Button>
             </Stack>
-            <p>{status}</p>
+            <p style={{ whiteSpace: 'pre-wrap' }}>{status}</p>
             <pre>{data}</pre>
             {!isSupported && <p style={{ color: 'red' }}>NFC не поддерживается в вашем браузере</p>}
         </div>
+    );
+}
+
+export default function NFCRead() {
+    return (
+        <ErrorBoundary title="Ошибка NFC">
+            <NFCReadInner />
+        </ErrorBoundary>
     );
 }

@@ -26,8 +26,9 @@ import {
 } from '@mui/icons-material';
 
 export default function InstallPWAButton() {
-    const [, promptToInstall] = useAddToHomescreenPrompt();
-    const { status, statusText, isInstalled, isInstallable, browserRecommendation, isDesktop } = usePWAInstallStatus();
+    const [promptEvent, promptToInstall] = useAddToHomescreenPrompt();
+    const { status, statusText, isInstalled, isInstallable, browserRecommendation, isDesktop } =
+        usePWAInstallStatus(promptEvent);
     const [showDialog, setShowDialog] = useState(false);
     const [isClient, setIsClient] = useState(false);
     const [error, setError] = useState<string | null>(null);

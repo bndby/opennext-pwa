@@ -16,7 +16,7 @@ const roboto = Roboto({
 const APP_NAME = 'OpenNext PWA';
 const APP_DEFAULT_TITLE = 'OpenNext PWA';
 const APP_TITLE_TEMPLATE = '%s - OpenNext PWA';
-const APP_DESCRIPTION = 'OpenNext PWA';
+const APP_DESCRIPTION = 'Демонстрация возможностей PWA на OpenNext и Cloudflare';
 
 export const metadata: Metadata = {
     applicationName: APP_NAME,

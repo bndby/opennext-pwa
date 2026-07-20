@@ -22,6 +22,9 @@ export default function FSOpenText() {
             const text = await file.text();
             setText(text);
         } catch (error) {
+            if (error instanceof DOMException && error.name === 'AbortError') {
+                return;
+            }
             console.error('Ошибка при открытии файла:', error);
         }
     };

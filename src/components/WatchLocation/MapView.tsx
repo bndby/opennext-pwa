@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { fromLonLat } from 'ol/proj';
 import 'ol/ol.css';
 import { RFeature, RGeolocation, RLayerVector, RMap, RStyle, useOL } from 'rlayers';
@@ -15,19 +15,17 @@ export type MapViewProps = {
     longitude: number;
 };
 
-export const MapView = ({ latitude, longitude }: MapViewProps) => {
-    const [isClient, setIsClient] = useState(false);
-    const center = fromLonLat([longitude, latitude]);
+/** Слой геолокации — только внутри RMap, где доступен useOL */
+function MapGeolocationContent({ latitude, longitude }: MapViewProps) {
     const [pos, setPos] = useState(new Point(fromLonLat([longitude, latitude])));
-    const [accuracy, setAccuracy] = useState(undefined as Geometry | undefined);
-    // Low-level access to the OpenLayers API
+    const [accuracy, setAccuracy] = useState<Geometry | undefined>(undefined);
     const { map } = useOL();
 
     useEffect(() => {
-        setIsClient(true);
-    }, []);
+        setPos(new Point(fromLonLat([longitude, latitude])));
+    }, [latitude, longitude]);
 
-    const onChangeCallback = React.useCallback(
+    const onChangeCallback = useCallback(
         (e: BaseEvent) => {
             const geoloc = e.target as OLGeoLoc;
             const position = geoloc.getPosition();
@@ -49,24 +47,37 @@ export const MapView = ({ latitude, longitude }: MapViewProps) => {
         [map],
     );
 
-    // Не рендерим ничего до монтирования на клиенте
-    if (!isClient) {
-        return <div>Загрузка карты...</div>;
-    }
-
     return (
-        <RMap width={'100%'} height={'400px'} initial={{ center: center, zoom: 13 }}>
+        <>
             <RGeolocation tracking={true} trackingOptions={{ enableHighAccuracy: true }} onChange={onChangeCallback} />
-            {/* <ROSM /> */}
-            <RLayerStadia layer="osm_bright" retina={true} />
             <RLayerVector zIndex={10}>
                 <RStyle.RStyle>
                     <RStyle.RIcon src={pin.src} anchor={[0.5, 0.8]} />
                     <RStyle.RStroke color={'#007bff'} width={3} />
                 </RStyle.RStyle>
                 <RFeature geometry={pos}></RFeature>
-                <RFeature geometry={accuracy}></RFeature>
+                {accuracy && <RFeature geometry={accuracy}></RFeature>}
             </RLayerVector>
+        </>
+    );
+}
+
+export const MapView = ({ latitude, longitude }: MapViewProps) => {
+    const [isClient, setIsClient] = useState(false);
+    const center = fromLonLat([longitude, latitude]);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    if (!isClient) {
+        return <div>Загрузка карты...</div>;
+    }
+
+    return (
+        <RMap width={'100%'} height={'400px'} initial={{ center, zoom: 13 }}>
+            <MapGeolocationContent latitude={latitude} longitude={longitude} />
+            <RLayerStadia layer="osm_bright" retina={true} />
         </RMap>
     );
 };

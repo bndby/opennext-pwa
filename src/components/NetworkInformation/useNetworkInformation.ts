@@ -1,17 +1,38 @@
 import { useSyncExternalStore, useEffect, useState } from 'react';
 
-// Расширяем интерфейс Navigator для Network Information API
 interface NetworkInformation extends EventTarget {
     effectiveType: 'slow-2g' | '2g' | '3g' | '4g';
-    downlink: number; // Mb/sec
-    downlinkMax: number; // Mb/sec
-    rtt: number; // ms
-    saveData: boolean; // true if user has enabled data saver mode
+    downlink: number;
+    downlinkMax: number;
+    rtt: number;
+    saveData: boolean;
     type: 'bluetooth' | 'cellular' | 'ethernet' | 'none' | 'wifi' | 'wimax' | 'other' | 'unknown';
 }
 
 interface NavigatorWithConnection extends Navigator {
     connection?: NetworkInformation;
+}
+
+function getConnection(): NetworkInformation | null {
+    if (typeof navigator === 'undefined') return null;
+    return (navigator as NavigatorWithConnection).connection ?? null;
+}
+
+/** Стабильная подписка — не пересоздаётся на каждый рендер */
+function subscribeConnection(callback: () => void) {
+    const connection = getConnection();
+    if (!connection) {
+        return () => {};
+    }
+
+    connection.addEventListener('change', callback);
+    return () => {
+        connection.removeEventListener('change', callback);
+    };
+}
+
+function getServerSnapshot(): NetworkInformation | null {
+    return null;
 }
 
 export const useNetworkStatus = () => {
@@ -23,26 +44,7 @@ export const useNetworkStatus = () => {
         setIsSupported('connection' in navigator);
     }, []);
 
-    const subscribe = (callback: () => void) => {
-        if (!isSupported) return () => {};
+    const connection = useSyncExternalStore(subscribeConnection, getConnection, getServerSnapshot);
 
-        (navigator as NavigatorWithConnection).connection?.addEventListener('change', callback);
-
-        return () => {
-            (navigator as NavigatorWithConnection).connection?.removeEventListener('change', callback);
-        };
-    };
-
-    const getSnapshot = () => {
-        if (!isSupported) return null;
-        return (navigator as NavigatorWithConnection).connection || null;
-    };
-
-    const getServerSnapshot = () => {
-        return null;
-    };
-
-    const connection = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-
-    return { connection, isSupported, isClient };
+    return { connection: isSupported ? connection : null, isSupported, isClient };
 };

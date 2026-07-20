@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import { checkBrowserSupport } from '@/lib/browser-support';
 import { useClientSide } from './useClientSide';
 
 /**
- * Хук для проверки поддержки браузерного API
- * @param apiName - имя API для проверки (например, 'speechSynthesis', 'NDEFReader')
- * @returns isSupported - поддерживается ли API в браузере
+ * Хук для проверки поддержки браузерного API.
+ * @param apiName — имя API (`speechSynthesis`, `NDEFReader`, `contacts`, `getBattery`…)
+ * @returns поддерживается ли API в браузере
  */
 export function useBrowserSupport(apiName: string): boolean {
     const isClient = useClientSide();
@@ -12,7 +13,7 @@ export function useBrowserSupport(apiName: string): boolean {
 
     useEffect(() => {
         if (isClient) {
-            setIsSupported(apiName in window);
+            setIsSupported(checkBrowserSupport(apiName));
         }
     }, [apiName, isClient]);
 

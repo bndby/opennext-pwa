@@ -28,6 +28,9 @@ export default function FSOpenDir() {
             const text = await Promise.all(promises);
             setText(text.join('\n'));
         } catch (error) {
+            if (error instanceof DOMException && error.name === 'AbortError') {
+                return;
+            }
             console.error('Ошибка при открытии папки:', error);
         }
     };

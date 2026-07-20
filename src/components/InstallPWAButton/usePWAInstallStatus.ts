@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { IBeforeInstallPromptEvent } from './useAddToHomescreenPrompt';
 
-// Расширяем интерфейс Navigator для поддержки standalone свойства
 declare global {
     interface Navigator {
         standalone?: boolean;
@@ -10,15 +10,14 @@ declare global {
 }
 
 export type PWAInstallStatus =
-    | 'checking' // Проверяем статус
-    | 'installed' // Приложение уже установлено
-    | 'installable' // Доступно для установки
-    | 'not-supported' // Браузер не поддерживает PWA
-    | 'not-installable'; // PWA не готово к установке
+    | 'checking'
+    | 'installed'
+    | 'installable'
+    | 'not-supported'
+    | 'not-installable';
 
 export type DevicePlatform = 'desktop' | 'mobile' | 'tablet' | 'unknown';
 
-// Функция для определения типа устройства
 function detectDevicePlatform(): DevicePlatform {
     const userAgent = navigator.userAgent.toLowerCase();
     const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
@@ -27,7 +26,6 @@ function detectDevicePlatform(): DevicePlatform {
     if (isTablet) return 'tablet';
     if (isMobile) return 'mobile';
 
-    // Дополнительные проверки для десктопа
     const isDesktop =
         !isMobile &&
         !isTablet &&
@@ -39,11 +37,9 @@ function detectDevicePlatform(): DevicePlatform {
     return isDesktop ? 'desktop' : 'unknown';
 }
 
-// Функция для определения поддержки PWA в зависимости от браузера на десктопе
 function getDesktopBrowserSupport(): { supported: boolean; recommendation?: string } {
     const userAgent = navigator.userAgent.toLowerCase();
 
-    // Chrome и браузеры на базе Chromium (Edge, Brave, Opera)
     if (
         userAgent.includes('chrome') ||
         userAgent.includes('chromium') ||
@@ -54,7 +50,6 @@ function getDesktopBrowserSupport(): { supported: boolean; recommendation?: stri
         return { supported: true };
     }
 
-    // Firefox на десктопе (ограниченная поддержка)
     if (userAgent.includes('firefox')) {
         return {
             supported: false,
@@ -62,7 +57,6 @@ function getDesktopBrowserSupport(): { supported: boolean; recommendation?: stri
         };
     }
 
-    // Safari на macOS (ограниченная поддержка)
     if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
         return {
             supported: false,
@@ -76,7 +70,22 @@ function getDesktopBrowserSupport(): { supported: boolean; recommendation?: stri
     };
 }
 
-export function usePWAInstallStatus() {
+function isRunningAsPwa(): boolean {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isIOSStandalone = 'standalone' in window.navigator && window.navigator.standalone === true;
+    const isMinimalUI = window.matchMedia('(display-mode: minimal-ui)').matches;
+    const isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches;
+    // Только явный Android TWA referrer — пустой referrer НЕ считать признаком PWA
+    const isAndroidTwa = document.referrer.includes('android-app://');
+
+    return isStandalone || isIOSStandalone || isMinimalUI || isFullscreen || isAndroidTwa;
+}
+
+/**
+ * Статус установки PWA.
+ * @param promptEvent — событие из useAddToHomescreenPrompt (единый слушатель)
+ */
+export function usePWAInstallStatus(promptEvent: IBeforeInstallPromptEvent | null = null) {
     const [status, setStatus] = useState<PWAInstallStatus>('checking');
     const [isClient, setIsClient] = useState(false);
     const [platform, setPlatform] = useState<DevicePlatform>('unknown');
@@ -87,7 +96,6 @@ export function usePWAInstallStatus() {
         const detectedPlatform = detectDevicePlatform();
         setPlatform(detectedPlatform);
 
-        // Проверяем поддержку браузера для десктопа
         if (detectedPlatform === 'desktop') {
             const browserSupport = getDesktopBrowserSupport();
             if (browserSupport.recommendation) {
@@ -99,96 +107,51 @@ export function usePWAInstallStatus() {
     useEffect(() => {
         if (!isClient) return;
 
-        const checkInstallStatus = () => {
-            // Проверяем, запущено ли приложение в standalone режиме
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+        if (isRunningAsPwa()) {
+            setStatus('installed');
+            return;
+        }
 
-            // Проверяем для iOS Safari
-            const isIOSStandalone = 'standalone' in window.navigator && window.navigator.standalone === true;
+        if (!('serviceWorker' in navigator)) {
+            setStatus('not-supported');
+            return;
+        }
 
-            // Дополнительная проверка для Android WebView
-            const isMinimalUI = window.matchMedia('(display-mode: minimal-ui)').matches;
-            const isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches;
+        if (promptEvent) {
+            setStatus('installable');
+            return;
+        }
 
-            // Проверяем referrer для PWA режима
-            const referrerCheck = document.referrer === '' || document.referrer.includes('android-app://');
-
-            const isPWAMode = isStandalone || isIOSStandalone || isMinimalUI || isFullscreen || referrerCheck;
-
-            if (isPWAMode) {
-                setStatus('installed');
-                return;
-            }
-
-            // Проверяем базовую поддержку PWA
-            const hasServiceWorkerSupport = 'serviceWorker' in navigator;
-
-            if (!hasServiceWorkerSupport) {
-                setStatus('not-supported');
-                return;
-            }
-
-            // Проверяем наличие beforeinstallprompt события
-            let hasInstallPrompt = false;
-            let installPromptHandled = false;
-
-            const handleBeforeInstallPrompt = (e: Event) => {
-                e.preventDefault(); // Предотвращаем автоматический показ браузером
-                hasInstallPrompt = true;
-                installPromptHandled = true;
-                setStatus('installable');
-            };
-
-            const handleAppInstalled = () => {
-                setStatus('installed');
-            };
-
-            // Слушаем события установки
-            window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-            window.addEventListener('appinstalled', handleAppInstalled);
-
-            // Проверяем через манифест и другие признаки
-            const checkAdvancedCriteria = async () => {
-                // Проверяем наличие манифеста
-                const manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement;
-                if (!manifestLink) {
-                    if (!installPromptHandled) {
-                        setStatus('not-installable');
-                    }
-                    return;
-                }
-
-                // Проверяем HTTPS (кроме localhost)
-                const isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost';
-                if (!isHTTPS) {
-                    if (!installPromptHandled) {
-                        setStatus('not-installable');
-                    }
-                    return;
-                }
-
-                // Если через некоторое время событие не пришло, проверяем другие критерии
-                setTimeout(() => {
-                    if (!hasInstallPrompt && !installPromptHandled) {
-                        // Возможно приложение уже было установлено или не соответствует критериям
-                        setStatus('not-installable');
-                    }
-                }, 2000);
-            };
-
-            checkAdvancedCriteria();
-
-            return () => {
-                window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-                window.removeEventListener('appinstalled', handleAppInstalled);
-            };
+        const onInstalled = () => {
+            setStatus('installed');
         };
 
-        const cleanup = checkInstallStatus();
-        return cleanup;
-    }, [isClient]);
+        window.addEventListener('appinstalled', onInstalled);
 
-    // Функция для получения текстового описания статуса с учетом платформы
+        // Даём время на beforeinstallprompt; если не пришёл — not-installable
+        const timer = window.setTimeout(() => {
+            if (isRunningAsPwa()) return;
+            setStatus((current) => {
+                if (current === 'installable' || current === 'installed' || current === 'not-supported') {
+                    return current;
+                }
+                return 'not-installable';
+            });
+        }, 2000);
+
+        return () => {
+            window.clearTimeout(timer);
+            window.removeEventListener('appinstalled', onInstalled);
+        };
+    }, [isClient, promptEvent]);
+
+    // Когда prompt появляется позже — сразу installable
+    useEffect(() => {
+        if (!isClient || !promptEvent) return;
+        if (isRunningAsPwa()) return;
+        setStatus('installable');
+    }, [isClient, promptEvent]);
+
     const getStatusText = (): string => {
         const isDesktop = platform === 'desktop';
 

@@ -38,42 +38,7 @@ export type BatteryState =
           dischargingTime: number;
       };
 
-/**
- * Форматирует уровень заряда в проценты для отображения.
- *
- * @param level — значение от 0.0 до 1.0
- * @returns строка вида «87%»
- */
-export const formatBatteryLevel = (level: number): string => `${Math.round(level * 100)}%`;
-
-/**
- * Форматирует время батареи в читаемый вид.
- * API возвращает Infinity, когда время неизвестно или неприменимо.
- *
- * @param seconds — время в секундах
- * @returns «2 ч 15 мин», «45 мин» или «—» для Infinity/NaN
- */
-export const formatBatteryTime = (seconds: number): string => {
-    // Infinity приходит, когда устройство разряжается (chargingTime)
-    // или уже заряжено / заряжается (dischargingTime)
-    if (!Number.isFinite(seconds)) return '—';
-
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-
-    return hours > 0 ? `${hours} ч ${minutes} мин` : `${minutes} мин`;
-};
-
-/**
- * Возвращает цвет индикатора заряда для MUI LinearProgress.
- *
- * @param level — уровень заряда от 0.0 до 1.0
- */
-export const getBatteryLevelColor = (level: number): 'success' | 'warning' | 'error' => {
-    if (level > 0.5) return 'success';
-    if (level > 0.2) return 'warning';
-    return 'error';
-};
+export { formatBatteryLevel, formatBatteryTime, getBatteryLevelColor } from '@/lib/battery';
 
 /**
  * Хук для получения и отслеживания состояния батареи через Battery Status API.

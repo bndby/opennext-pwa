@@ -5,75 +5,45 @@ import { Alert, Box, Button, Stack, Typography } from '@mui/material';
 import { BarcodePrint } from './BarcodePrint';
 import useBarcodeSupported from './useBarcodeSupported';
 import { DetectedBarcode } from './types';
+import { useMediaStream } from '@/hooks/useMediaStream';
+import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary';
 
-export const BarcodeDetect = () => {
+function BarcodeDetectInner() {
     const videoRef = useRef<HTMLVideoElement>(null);
 
     const [barcodes, setBarcodes] = useState<DetectedBarcode[]>([]);
     const [messages, setMessages] = useState<string[]>([]);
-    const [isActive, setIsActive] = useState(false);
     const [isDetecting, setIsDetecting] = useState(false);
-    const [isStarting, setIsStarting] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
     const [isSupported, , isChecking] = useBarcodeSupported();
+    const { isActive, isStarting, start, stop, attachTo, error: mediaError } = useMediaStream({
+        video: { facingMode: 'environment' },
+        audio: false,
+    });
 
     const appendMessage = (message: string) => {
         setMessages((prev) => [...prev, message]);
     };
 
-    const stopCamera = () => {
-        const video = videoRef.current;
-        if (!video) {
-            setIsActive(false);
-            return;
-        }
-        const stream = video.srcObject as MediaStream | null;
-        if (stream) {
-            stream.getTracks().forEach((track) => track.stop());
-            video.srcObject = null;
-        }
-        setIsActive(false);
-    };
-
-    const startCamera = async (): Promise<boolean> => {
-        if (!videoRef.current || isStarting) {
-            return false;
-        }
-        setIsStarting(true);
-        setErrorMessage('');
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment' },
-                audio: false,
-            });
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-            } else {
-                stream.getTracks().forEach((track) => track.stop());
-            }
-            setIsActive(true);
-            return true;
-        } catch (err) {
-            const message = err instanceof Error ? err.message : 'Не удалось получить доступ к камере.';
-            setErrorMessage(`Ошибка камеры: ${message}`);
-            appendMessage(`Ошибка запуска камеры: ${message}`);
-            setIsActive(false);
-            return false;
-        } finally {
-            setIsStarting(false);
-        }
-    };
+    useEffect(() => {
+        attachTo(videoRef.current);
+    }, [attachTo]);
 
     useEffect(() => {
-        if (isSupported) {
-            void startCamera();
+        if (mediaError) {
+            setErrorMessage(mediaError);
+            appendMessage(mediaError);
         }
+    }, [mediaError]);
+
+    // Камеру не стартуем автоматически — только по жесту пользователя (handleStart)
+
+    useEffect(() => {
         return () => {
-            stopCamera();
+            stop();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isSupported]);
+    }, [stop]);
 
     const handleDetect = async () => {
         if (!videoRef.current || !isActive || isDetecting) {
@@ -84,7 +54,7 @@ export const BarcodeDetect = () => {
 
         const barcodeDetector = new window.BarcodeDetector();
         try {
-            const detectedBarcodes = await barcodeDetector.detect(videoRef.current);
+            const detectedBarcodes = (await barcodeDetector.detect(videoRef.current)) as DetectedBarcode[];
             setBarcodes(detectedBarcodes);
             appendMessage(`Найдено штрихкодов: ${detectedBarcodes.length}`);
         } catch (err) {
@@ -97,12 +67,13 @@ export const BarcodeDetect = () => {
     };
 
     const handleStop = () => {
-        stopCamera();
+        stop();
         appendMessage('Камера остановлена.');
     };
 
     const handleStart = async () => {
-        const started = await startCamera();
+        if (!isSupported) return;
+        const started = await start();
         if (started) {
             appendMessage('Камера запущена.');
         }
@@ -141,7 +112,7 @@ export const BarcodeDetect = () => {
                         </Button>
                     </>
                 ) : (
-                    <Button variant="contained" color="success" onClick={handleStart} disabled={isStarting}>
+                    <Button variant="contained" color="success" onClick={handleStart} disabled={isStarting || isChecking}>
                         {isStarting ? 'Запускаем...' : 'Запустить камеру'}
                     </Button>
                 )}
@@ -171,4 +142,10 @@ export const BarcodeDetect = () => {
             )}
         </Box>
     );
-};
+}
+
+export const BarcodeDetect = () => (
+    <ErrorBoundary title="Ошибка сканера штрихкодов">
+        <BarcodeDetectInner />
+    </ErrorBoundary>
+);

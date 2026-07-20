@@ -43,3 +43,11 @@ next-env.d.ts
 .dev.vars
 
 certificates
+
+# next-pwa / workbox (генерируются при сборке)
+/public/sw.js
+/public/sw.js.map
+/public/workbox-*.js
+/public/workbox-*.js.map
+/public/swe-worker-*.js
+/public/fallback-*.js

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import setupIndexedDB, { useIndexedDBStore } from 'use-indexeddb';
 import { useBrowserSupport } from '@/hooks/useBrowserSupport';
 import { useClientSide } from '@/hooks/useClientSide';
+import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary';
 
 const idbConfig = {
     databaseName: 'opennext-pwa',
@@ -19,7 +20,7 @@ const idbConfig = {
     ],
 };
 
-export const IndexDB = () => {
+function IndexDBInner() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string>('');
     const [isInitialized, setIsInitialized] = useState(false);
@@ -32,15 +33,25 @@ export const IndexDB = () => {
             return;
         }
 
+        let cancelled = false;
+
         setupIndexedDB(idbConfig)
             .then(() => {
-                console.log('IndexedDB initialized successfully');
-                setIsInitialized(true);
+                if (!cancelled) {
+                    setIsInitialized(true);
+                    setError('');
+                }
             })
-            .catch((e) => {
-                console.error('Ошибка инициализации IndexedDB:', e);
-                setError('Не удалось инициализировать базу данных. Попробуйте обновить страницу.');
+            .catch(() => {
+                if (!cancelled) {
+                    setError('Не удалось инициализировать базу данных. Попробуйте обновить страницу.');
+                    setIsInitialized(false);
+                }
             });
+
+        return () => {
+            cancelled = true;
+        };
     }, [isSupported]);
 
     const { add, getAll } = useIndexedDBStore<{ content: string }>('test');
@@ -57,13 +68,9 @@ export const IndexDB = () => {
         setError('');
 
         try {
-            const id = await add({
-                content: content,
-            });
-            console.log(`Added with ID ${id}`);
+            await add({ content });
             setContent('');
         } catch (err) {
-            console.error('Save error:', err);
             setError('Ошибка сохранения: ' + (err instanceof Error ? err.message : 'Неизвестная ошибка'));
         } finally {
             setIsLoading(false);
@@ -79,20 +86,26 @@ export const IndexDB = () => {
             const str = data.map((d) => d.content).join('\n');
             setContent(str);
         } catch (err) {
-            console.error('Load error:', err);
             setError('Ошибка загрузки: ' + (err instanceof Error ? err.message : 'Неизвестная ошибка'));
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Не рендерим ничего до монтирования на клиенте
     if (!isClient) {
         return <div>Загрузка...</div>;
     }
 
     if (!isSupported) {
         return <div>IndexedDB не поддерживается в вашем браузере</div>;
+    }
+
+    if (error && !isInitialized) {
+        return (
+            <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+            </Alert>
+        );
     }
 
     if (!isInitialized) {
@@ -140,4 +153,10 @@ export const IndexDB = () => {
             </Stack>
         </>
     );
-};
+}
+
+export const IndexDB = () => (
+    <ErrorBoundary title="Ошибка IndexedDB">
+        <IndexDBInner />
+    </ErrorBoundary>
+);

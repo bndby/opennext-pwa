@@ -1,48 +1,32 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useClientSide } from '@/hooks/useClientSide';
+import { useMediaStream } from '@/hooks/useMediaStream';
+import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary';
 
-export const MediaPWA = () => {
+function MediaPWAInner() {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [error, setError] = useState<string>('');
     const isClient = useClientSide();
-    const [isSupported, setIsSupported] = useState<boolean>(false);
-
-    // Проверяем поддержку MediaDevices API
-    useEffect(() => {
-        if (isClient) {
-            const supported = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-            setIsSupported(supported);
-        }
-    }, [isClient]);
+    const { error, isSupported, start, stop, attachTo, isStarting } = useMediaStream({
+        video: true,
+        audio: true,
+    });
 
     useEffect(() => {
-        async function getMedia() {
-            if (!isSupported) {
-                setError('MediaDevices API не поддерживается в вашем браузере');
-                return;
-            }
+        attachTo(videoRef.current);
+    }, [attachTo, isClient]);
 
-            try {
-                if (videoRef.current) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                    videoRef.current.srcObject = stream;
-                    setError('');
-                }
-            } catch (err) {
-                setError(
-                    'Ошибка доступа к камере/микрофону: ' + (err instanceof Error ? err.message : 'Неизвестная ошибка'),
-                );
-            }
-        }
+    useEffect(() => {
+        if (!isClient || !isSupported) return;
 
-        if (isSupported) {
-            getMedia();
-        }
-    }, [isSupported]);
+        void start();
 
-    // Не рендерим ничего до монтирования на клиенте
+        return () => {
+            stop();
+        };
+    }, [isClient, isSupported, start, stop]);
+
     if (!isClient) {
         return <div>Загрузка...</div>;
     }
@@ -51,8 +35,17 @@ export const MediaPWA = () => {
         <div>
             <p>Media</p>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            {isSupported && <video ref={videoRef} width="100%" playsInline autoPlay muted></video>}
+            {isSupported && (
+                <video ref={videoRef} width="100%" playsInline autoPlay muted aria-label="Предпросмотр камеры" />
+            )}
             {!isSupported && <p style={{ color: 'red' }}>MediaDevices API не поддерживается в вашем браузере</p>}
+            {isStarting && <p>Запрашиваем доступ к камере…</p>}
         </div>
     );
-};
+}
+
+export const MediaPWA = () => (
+    <ErrorBoundary title="Ошибка медиа">
+        <MediaPWAInner />
+    </ErrorBoundary>
+);

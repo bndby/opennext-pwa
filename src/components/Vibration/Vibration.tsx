@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Box, Typography, Alert } from '@mui/material';
+import { buildVibrationPattern } from '@/lib/vibration-pattern';
 
 interface TouchData {
     id: number;
@@ -19,8 +20,8 @@ export const Vibration = () => {
 
     const touchIdCounter = useRef(0);
     const activeTouches = useRef<Map<number, TouchData>>(new Map());
+    const playTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Проверка доступности API
     useEffect(() => {
         const vibrationSupported = 'vibrate' in navigator;
         const touchSupported = 'ontouchstart' in window;
@@ -34,7 +35,25 @@ export const Vibration = () => {
         }
     }, []);
 
-    // Обработчики touch событий
+    useEffect(() => {
+        return () => {
+            if (playTimeoutRef.current != null) {
+                clearTimeout(playTimeoutRef.current);
+                playTimeoutRef.current = null;
+            }
+            if ('vibrate' in navigator) {
+                navigator.vibrate(0);
+            }
+        };
+    }, []);
+
+    const clearPlayTimeout = useCallback(() => {
+        if (playTimeoutRef.current != null) {
+            clearTimeout(playTimeoutRef.current);
+            playTimeoutRef.current = null;
+        }
+    }, []);
+
     const handleTouchStart = useCallback(
         (event: React.TouchEvent) => {
             if (!isRecording) return;
@@ -75,7 +94,6 @@ export const Vibration = () => {
         [isRecording],
     );
 
-    // Функции управления
     const startRecording = () => {
         setIsRecording(true);
         setTouches([]);
@@ -102,32 +120,17 @@ export const Vibration = () => {
         if (!isSupported || touches.length === 0) return;
 
         try {
+            clearPlayTimeout();
             setIsPlaying(true);
             setError(null);
 
-            // Создаем паттерн вибрации с паузами между касаниями
-            const pattern: number[] = [];
-            let totalDuration = 0;
-
-            touches.forEach((touch, index) => {
-                // Добавляем длительность вибрации
-                pattern.push(touch.duration);
-                totalDuration += touch.duration;
-
-                // Добавляем паузу между касаниями (кроме последнего)
-                if (index < touches.length - 1) {
-                    const pause = Math.max(50, Math.min(200, touch.duration * 0.3)); // Пауза от 50 до 200мс
-                    pattern.push(pause);
-                    totalDuration += pause;
-                }
-            });
-
+            const { pattern, totalDuration } = buildVibrationPattern(touches);
             navigator.vibrate(pattern);
 
-            // Останавливаем воспроизведение через общую длительность паттерна
-            setTimeout(() => {
+            playTimeoutRef.current = setTimeout(() => {
                 setIsPlaying(false);
                 navigator.vibrate(0);
+                playTimeoutRef.current = null;
             }, totalDuration + 100);
         } catch {
             setError('Ошибка при воспроизведении вибрации');
@@ -136,6 +139,7 @@ export const Vibration = () => {
     };
 
     const stopVibration = () => {
+        clearPlayTimeout();
         setIsPlaying(false);
         navigator.vibrate(0);
     };
@@ -144,12 +148,13 @@ export const Vibration = () => {
         if (!isSupported) return;
 
         try {
-            // Простой тестовый паттерн: короткая вибрация, пауза, длинная вибрация
             navigator.vibrate([100, 50, 200]);
         } catch {
             setError('Ошибка при тестовой вибрации');
         }
     };
+
+    const patternPreview = buildVibrationPattern(touches).pattern;
 
     if (!isSupported) {
         return <Alert severity="warning">{error}</Alert>;
@@ -157,7 +162,6 @@ export const Vibration = () => {
 
     return (
         <Box sx={{ p: 2 }}>
-            {/* Область для касаний */}
             <Box
                 sx={{
                     height: 200,
@@ -174,7 +178,6 @@ export const Vibration = () => {
                 <Typography>{isRecording ? `Запись... (${touches.length})` : 'Касайтесь экрана для записи'}</Typography>
             </Box>
 
-            {/* Кнопки управления */}
             <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
                 <Button variant="contained" onClick={startRecording} disabled={isRecording || isPlaying}>
                     Начать запись
@@ -198,7 +201,6 @@ export const Vibration = () => {
                 </Button>
             </Box>
 
-            {/* Информация о касаниях */}
             {touches.length > 0 && (
                 <Box>
                     <Typography variant="h6" gutterBottom>
@@ -212,22 +214,12 @@ export const Vibration = () => {
                         ))}
                     </Box>
 
-                    {/* Показываем паттерн вибрации */}
                     <Typography variant="body2" sx={{ mt: 1, fontFamily: 'monospace' }}>
-                        Паттерн: [
-                        {touches
-                            .map((touch, index) => {
-                                const pause =
-                                    index < touches.length - 1 ? Math.max(50, Math.min(200, touch.duration * 0.3)) : 0;
-                                return pause > 0 ? `${touch.duration}, ${pause}` : touch.duration;
-                            })
-                            .join(', ')}
-                        ] мс
+                        Паттерн: [{patternPreview.join(', ')}] мс
                     </Typography>
                 </Box>
             )}
 
-            {/* Статус воспроизведения */}
             {isPlaying && (
                 <Alert severity="info" sx={{ mt: 2 }}>
                     Воспроизведение вибрации...

@@ -4,24 +4,15 @@ import { Chip } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { useClientSide } from '@/hooks/useClientSide';
-import { useEffect, useState } from 'react';
+import { useBrowserSupport } from '@/hooks/useBrowserSupport';
 
 /**
  * Индикатор поддержки Battery Status API в текущем браузере.
- * Отображает Chip с результатом проверки наличия navigator.getBattery.
  */
 export default function BatterySupport() {
     const isClient = useClientSide();
-    const [isSupported, setIsSupported] = useState(false);
+    const isSupported = useBrowserSupport('getBattery');
 
-    useEffect(() => {
-        if (isClient) {
-            // Проверяем наличие метода, а не вызываем getBattery — это лёгкая синхронная проверка
-            setIsSupported('getBattery' in navigator);
-        }
-    }, [isClient]);
-
-    // До гидратации navigator недоступен — показываем заглушку
     if (!isClient) {
         return <div>Загрузка...</div>;
     }

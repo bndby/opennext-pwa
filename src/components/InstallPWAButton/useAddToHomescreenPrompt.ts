@@ -1,6 +1,8 @@
+'use client';
+
 import * as React from 'react';
 
-interface IBeforeInstallPromptEvent extends Event {
+export interface IBeforeInstallPromptEvent extends Event {
     readonly platforms: string[];
     readonly userChoice: Promise<{
         outcome: 'accepted' | 'dismissed';
@@ -9,9 +11,11 @@ interface IBeforeInstallPromptEvent extends Event {
     prompt(): Promise<void>;
 }
 
+/**
+ * Единый источник beforeinstallprompt — не дублировать слушатель в других хуках.
+ */
 export function useAddToHomescreenPrompt(): [IBeforeInstallPromptEvent | null, () => Promise<void>] {
     const [prompt, setState] = React.useState<IBeforeInstallPromptEvent | null>(null);
-    const [, setIsClient] = React.useState(false);
 
     const promptToInstall = async (): Promise<void> => {
         if (prompt) {
@@ -21,17 +25,21 @@ export function useAddToHomescreenPrompt(): [IBeforeInstallPromptEvent | null, (
     };
 
     React.useEffect(() => {
-        setIsClient(true);
-
-        const ready = (e: IBeforeInstallPromptEvent) => {
+        const ready = (e: Event) => {
             e.preventDefault();
-            setState(e);
+            setState(e as IBeforeInstallPromptEvent);
         };
 
-        window.addEventListener('beforeinstallprompt', ready as EventListener);
+        const onInstalled = () => {
+            setState(null);
+        };
+
+        window.addEventListener('beforeinstallprompt', ready);
+        window.addEventListener('appinstalled', onInstalled);
 
         return () => {
-            window.removeEventListener('beforeinstallprompt', ready as EventListener);
+            window.removeEventListener('beforeinstallprompt', ready);
+            window.removeEventListener('appinstalled', onInstalled);
         };
     }, []);
 

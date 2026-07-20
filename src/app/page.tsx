@@ -3,11 +3,10 @@ import { Typography, Card, CardContent, CardActionArea, Box } from '@mui/materia
 import { Link } from 'next-view-transitions';
 import { MENU } from '@/menu';
 import { VersionInfo } from '@/components/VersionInfo/VersionInfo';
-import { getGitCommitInfo } from '@/lib/git-info';
+import { resolveCommitInfo } from '@/lib/git-info';
 
 export default function Home() {
-    // Получаем информацию о коммите на сервере
-    const gitInfo = getGitCommitInfo();
+    const gitInfo = resolveCommitInfo();
     const commitInfo = gitInfo
         ? {
               shortHash: gitInfo.shortHash,
